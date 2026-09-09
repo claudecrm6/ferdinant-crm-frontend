@@ -2027,9 +2027,19 @@
                     o'quvchi</span></div>
             <div class="form-group"><label>Ism familiya *</label><input id="m-sname" placeholder="To'liq ism"></div>
             <div class="form-group"><label>Egasi (Foydalanuvchi)</label><select id="m-suser" onchange="refreshGroupSelectForOwner()"></select></div>
-            <div class="form-group"><label>Guruh</label><select id="m-sgroup"></select></div>
+            <div class="form-group"><label>Guruh</label><select id="m-sgroup" onchange="onStudentGroupChange()"></select></div>
             <div class="form-group"><label>Oylik to'lov (so'm)</label><input id="m-sdebt" type="text"
                     class="money-input">
+            </div>
+            <div class="form-group">
+                <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+                    <input id="m-sdiscount" type="checkbox" onchange="onStudentDiscountToggle()" style="width:16px;height:16px">
+                    Chegirma (individual narx)
+                </label>
+                <div style="font-size:12px;color:var(--text2);margin-top:4px">
+                    Belgilansa, yuqorida kiritilgan summa doimiy individual oylik narx sifatida saqlanadi va keyingi
+                    oylarda guruh narxi o'zgarsa ham o'zgarmaydi.
+                </div>
             </div>
             <div class="modal-actions">
                 <button class="btn btn-ghost" onclick="closeModal('student-modal')">Bekor</button>
@@ -2526,6 +2536,23 @@
             }
         }
 
+        // O'quvchining OYLIK narxini frontendda ham backenddagi
+        // get_student_monthly_price() bilan bir xil qoidada aniqlaydi:
+        // - Chegirma yoqilgan (has_discount) va discounted_price kiritilgan
+        //   bo'lsa -> o'sha individual narx qaytariladi (guruh narxi
+        //   o'zgarganda ham o'zgarmaydi).
+        // - Aks holda guruh narxi, guruh yo'q bo'lsa mavjud original_debt.
+        function getStudentMonthlyPrice(student) {
+            if (student.has_discount && student.discounted_price != null) {
+                return student.discounted_price;
+            }
+            const grp = groups.find(g => g.id === student.group);
+            if (grp && grp.price != null) {
+                return grp.price;
+            }
+            return student.original_debt || 0;
+        }
+
         async function checkNewMonthDebts() {
 
             const headers = {
@@ -2542,9 +2569,9 @@
                 if (student.period !== currentPeriod) {
 
                     const oldDebt = student.debt_amount;
+                    const monthlyPrice = getStudentMonthlyPrice(student);
 
-                    const newOriginalDebt =
-                        student.original_debt + oldDebt;
+                    const newOriginalDebt = monthlyPrice + oldDebt;
 
                     const updateData = {
                         ...student,
@@ -3276,7 +3303,8 @@
                     </div>
                     <div style="margin-bottom:14px">${statusBadge}</div>
                     <div class="student-detail-divider"></div>
-                    <div class="student-detail-row"><span>Guruh narxi</span><span>${fmtFull(s.original_debt)} so'm</span></div>
+                    <div class="student-detail-row"><span>Joriy oy to'lovi</span><span>${fmtFull(s.original_debt)} so'm</span></div>
+                    ${s.has_discount ? `<div class="student-detail-row"><span>Chegirma</span><span style="color:var(--amber)">✓ Individual narx: ${fmtFull(s.discounted_price)} so'm</span></div>` : ""}
                     <div class="student-detail-row"><span>To'langan</span><span style="color:var(--green)">${fmtFull(s.paid_amount)} so'm</span></div>
                     <div class="student-detail-row"><span>Qolgan qarz</span><span style="color:${s.debt_amount > 0 ? "var(--red)" : "var(--green)"}">${s.debt_amount > 0 ? fmtFull(s.debt_amount) + " so'm" : "Yo'q ✓"}</span></div>
                     ${grp ? `
@@ -3398,6 +3426,7 @@
             document.getElementById("student-modal-title").textContent = s ? "O'quvchini tahrirlash" : "Yangi o'quvchi";
             document.getElementById("m-sname").value = s?.name || "";
             setMoneyVal("m-sdebt", s?.original_debt || 500000);
+            document.getElementById("m-sdiscount").checked = !!s?.has_discount;
 
             // Tahrirlashda o'quvchining guruhi qaysi foydalanuvchiga tegishli bo'lsa,
             // "Egasi" dropdowni o'shani ko'rsatadi. Yangi o'quvchida — joriy login qilgan foydalanuvchi.
@@ -3413,11 +3442,32 @@
             openModal("student-modal");
         }
 
+        // Guruh tanlanganda (yoki o'zgartirilganda), agar "Chegirma" belgilanmagan
+        // bo'lsa, oylik to'lov maydonini avtomatik ravishda shu guruhning kurs
+        // narxi bilan to'ldiradi. Chegirma belgilangan bo'lsa, individual narx
+        // ustidan yozib yuborilmasligi uchun tegilmaydi.
+        function onStudentGroupChange() {
+            const discountChecked = document.getElementById("m-sdiscount")?.checked;
+            if (discountChecked) return;
+            const groupId = parseInt(document.getElementById("m-sgroup").value) || null;
+            const grp = groups.find(g => g.id === groupId);
+            if (grp && grp.price != null) {
+                setMoneyVal("m-sdebt", grp.price);
+            }
+        }
+
+        // Checkbox holati o'zgarganda alohida qo'shimcha ish talab qilinmaydi —
+        // saqlashda joriy "Oylik to'lov" summasi individual narx sifatida olinadi.
+        // Bu funksiya faqat kelajakda kengaytirish uchun joy sifatida qoldirilgan.
+        function onStudentDiscountToggle() {}
+
         async function saveStudent() {
             const name = document.getElementById("m-sname").value.trim();
             if (!name) return toast("Ism kiritilishi shart!", "error");
             const groupId = parseInt(document.getElementById("m-sgroup").value) || null;
             const originalDebt = getMoneyVal("m-sdebt");
+            const hasDiscount = document.getElementById("m-sdiscount").checked;
+            const discountedPrice = hasDiscount ? originalDebt : null;
 
             let data = {
                 name,
@@ -3425,7 +3475,9 @@
                 original_debt: originalDebt,
                 debt_amount: originalDebt,
                 paid_amount: 0,
-                payment_status: originalDebt > 0 ? "debt" : "paid"
+                payment_status: originalDebt > 0 ? "debt" : "paid",
+                has_discount: hasDiscount,
+                discounted_price: discountedPrice
             };
 
             if (editStudentId) {
@@ -3439,7 +3491,9 @@
                         original_debt: originalDebt,
                         debt_amount: newDebtAmount > 0 ? newDebtAmount : 0,
                         paid_amount: oldStudent.paid_amount,
-                        payment_status: newDebtAmount <= 0 ? "paid" : (oldStudent.paid_amount > 0 ? "partial" : "debt")
+                        payment_status: newDebtAmount <= 0 ? "paid" : (oldStudent.paid_amount > 0 ? "partial" : "debt"),
+                        has_discount: hasDiscount,
+                        discounted_price: discountedPrice
                     };
                 }
                 const res = await fetch(`${API_URL}/students/${editStudentId}/`, {
@@ -3528,7 +3582,7 @@
             if (!isFullyPaid) {
                 lessonsSoFar = countLessonsThisMonth(grp, s.created_at);
                 const totalLessonsInMonth = countTotalLessonsInMonth(grp) || 1;
-                const monthlyPrice = grp?.price ?? s.original_debt ?? 500000;
+                const monthlyPrice = getStudentMonthlyPrice(s);
                 const proRatedFee = Math.round((monthlyPrice / totalLessonsInMonth) * lessonsSoFar);
                 actualDebt = Math.max(0, proRatedFee - (s.paid_amount || 0));
             }
@@ -3649,8 +3703,7 @@
             const year = curYear();
             return students
                 .map(s => {
-                    const grp = groups.find(g => g.id === s.group);
-                    const monthlyPrice = (grp && grp.price != null) ? grp.price : (s.original_debt || 0);
+                    const monthlyPrice = getStudentMonthlyPrice(s);
                     const paidInMonth = payments
                         .filter(p => p.student === s.id && p.month === debtorMonth && p.year === year)
                         .reduce((sum, p) => sum + p.amount, 0);
