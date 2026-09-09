@@ -2270,6 +2270,7 @@
         let studentSearch = "";
         let paymentSearch = "";
         let debtorSearch = "";
+        let debtorMonth = ""; // Qarzdorlar bo'limidagi oy filtri ("" = barchasi/umumiy qarzdorlik)
         let currentDebtorPage = 1;
         let groupFilter = "all";
         let editGroupId = null;
@@ -3547,15 +3548,27 @@
     <i class="fab fa-telegram"></i> <span class="add-student-label">Ogohlantirish yuborish</span>
 </button>
             </div>
-            <div class="chart-box" style="margin-bottom:16px">
-                <div class="stat-lbl" style="margin-bottom:6px">Jami qarzdorlik</div>
-                <div class="stat-val sm" id="debtors-total-sum" style="color:var(--red)"></div>
+                        <div class="chart-box" style="margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+                <div>
+                    <div class="stat-lbl" style="margin-bottom:6px" id="debtors-total-label">Jami qarzdorlik</div>
+                    <div class="stat-val sm" id="debtors-total-sum" style="color:var(--red)"></div>
+                </div>
+                <select id="d-month" style="min-width:150px">
+                    <option value="">Barcha oylar</option>
+                    ${MONTHS_UZ.map(m => `<option value="${m}">${m}</option>`).join("")}
+                </select>
             </div>
             <div id="debtors-list"></div>
             <div id="debtors-pagination" class="pagination"></div>`;
 
                 document.getElementById("d-search").addEventListener("input", e => {
                     debtorSearch = e.target.value;
+                    currentDebtorPage = 1;
+                    _refreshDebtorList();
+                });
+
+                document.getElementById("d-month").addEventListener("change", e => {
+                    debtorMonth = e.target.value;
                     currentDebtorPage = 1;
                     _refreshDebtorList();
                 });
@@ -3566,18 +3579,51 @@
                 searchEl.value = debtorSearch;
             }
 
+            const monthEl = document.getElementById("d-month");
+            if (monthEl && monthEl.value !== debtorMonth) {
+                monthEl.value = debtorMonth;
+            }
+
             _refreshDebtorList();
         }
 
+        // Tanlangan oy filtriga qarab qarzdorlar ro'yxatini qaytaradi.
+        // - debtorMonth === "" (Barcha oylar): hozirgi umumiy (barcha oylar
+        //   qo'shilib ketgan, carryover bilan) qarzdorlik - hech narsa o'zgarmaydi.
+        // - debtorMonth = biror oy: FAQAT shu oyning narxi (o'quvchi guruhining
+        //   joriy narxi) va FAQAT shu oyga tegishli deb kiritilgan to'lovlar
+        //   (p.month/p.year - to'lov qaysi oy qarziga yozilgani) asosida,
+        //   o'sha oyga tegishli qarzdorlik alohida hisoblanadi. Bu boshqa
+        //   oylardagi yoki umumiy (original_debt) qarzdorlik bilan aralashmaydi.
+        function getDebtorsForCurrentFilter() {
+            if (!debtorMonth) {
+                return students.filter(s => s.debt_amount > 0);
+            }
+            const year = curYear();
+            return students
+                .map(s => {
+                    const grp = groups.find(g => g.id === s.group);
+                    const monthlyPrice = (grp && grp.price != null) ? grp.price : (s.original_debt || 0);
+                    const paidInMonth = payments
+                        .filter(p => p.student === s.id && p.month === debtorMonth && p.year === year)
+                        .reduce((sum, p) => sum + p.amount, 0);
+                    const monthDebt = Math.max(0, monthlyPrice - paidInMonth);
+                    return { ...s, debt_amount: monthDebt, paid_amount: paidInMonth };
+                })
+                .filter(s => s.debt_amount > 0);
+        }
+
         function _refreshDebtorList() {
-            const debtorsList = students
-                .filter(s => s.debt_amount > 0)
+            const debtorsList = getDebtorsForCurrentFilter()
                 .filter(s => s.name.toLowerCase().includes(debtorSearch.toLowerCase()))
                 .sort((a, b) => b.debt_amount - a.debt_amount);
 
             const totalSum = debtorsList.reduce((s, st) => s + st.debt_amount, 0);
             const totalSumEl = document.getElementById("debtors-total-sum");
             if (totalSumEl) totalSumEl.textContent = fmtFull(totalSum) + " so'm";
+
+            const labelEl = document.getElementById("debtors-total-label");
+            if (labelEl) labelEl.textContent = debtorMonth ? `${debtorMonth} oyi qarzdorligi` : "Jami qarzdorlik";
 
             const total = Math.ceil(debtorsList.length / PER_PAGE) || 1;
             if (currentDebtorPage > total) currentDebtorPage = 1;
