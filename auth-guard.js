@@ -167,6 +167,7 @@ function getDeviceId() {
 function clearLocalSessionData() {
     localStorage.removeItem(CURRENT_USER_KEY);
     localStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem("ferdinant_view_state");
 }
 function getStoredToken() {
     return localStorage.getItem(TOKEN_KEY) || '';
