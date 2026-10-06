@@ -2,7 +2,7 @@
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 
     <script>
     (function () {
@@ -2258,6 +2258,34 @@
         }
 
         .dx-empty { text-align: center; padding: 40px 12px; color: var(--text3); font-size: 13px }
+
+        /* ===== Dashboard JOYLASHUVI (dizayn o'zgarmagan) ===== */
+        .dx {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-template-areas:
+                "met  met  met"
+                "hero hero list"
+                "chart chart list";
+            gap: 16px;
+        }
+        .dx-top, .dx-main { display: contents }
+        .dx-metrics { grid-area: met; grid-template-columns: repeat(4, minmax(0, 1fr)) }
+        .dx-hero { grid-area: hero; min-height: 220px }
+        .dx-main > .dx-card:nth-child(1) { grid-area: chart }
+        .dx-main > .dx-card:nth-child(2) { grid-area: list }
+        @media (max-width: 1100px) {
+            .dx { grid-template-columns: 1fr 1fr; grid-template-areas: "met met" "hero hero" "chart chart" "list list" }
+            .dx-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)) }
+        }
+        @media (max-width: 720px) {
+            .dx { grid-template-columns: 1fr; grid-template-areas: "met" "hero" "chart" "list"; gap: 12px }
+            .dx-hero { min-height: 0 }
+        }
+
+        /* ===== Zoom taqiqlangan ===== */
+        html, body { touch-action: pan-x pan-y; -webkit-text-size-adjust: 100%; text-size-adjust: 100% }
+        input, select, textarea, button { touch-action: manipulation }
         .dx-empty i { display: block; font-size: 26px; margin-bottom: 12px; opacity: .6 }
 
         @media (max-width: 1100px) {
@@ -3923,14 +3951,6 @@
 
             document.getElementById("content").innerHTML = `
         <div class="dx">
-            <div class="dx-head">
-                <div>
-                    <div class="dx-eyebrow">${dateStr}</div>
-                    <div class="dx-title">${greet}${uName ? `, <span>${esc(uName)}</span>` : ""}</div>
-                </div>
-                <div class="dx-pill"><i></i>${curMonth()} oyi</div>
-            </div>
-
             <div class="dx-top">
                 <div class="dx-card dx-hero">
                     <div>
@@ -7034,6 +7054,26 @@
 
         document.getElementById('footer-year').textContent = new Date().getFullYear();
     </script>
+<script>
+/* Zoom taqiqlangan */
+(function () {
+    var opt = { passive: false };
+    document.addEventListener("wheel", function (e) { if (e.ctrlKey) e.preventDefault(); }, opt);
+    document.addEventListener("keydown", function (e) {
+        if ((e.ctrlKey || e.metaKey) && ["+", "=", "-", "_", "0", "Add", "Subtract"].indexOf(e.key) !== -1) e.preventDefault();
+    });
+    ["gesturestart", "gesturechange", "gestureend"].forEach(function (n) {
+        document.addEventListener(n, function (e) { e.preventDefault(); }, opt);
+    });
+    document.addEventListener("touchmove", function (e) { if (e.touches && e.touches.length > 1) e.preventDefault(); }, opt);
+    var last = 0;
+    document.addEventListener("touchend", function (e) {
+        var t = Date.now();
+        if (t - last < 300) e.preventDefault();
+        last = t;
+    }, opt);
+})();
+</script>
 </body>
 
 </html>
