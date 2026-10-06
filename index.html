@@ -2,7 +2,7 @@
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
 
     <script>
     (function () {
@@ -1885,6 +1885,1049 @@
                 font-size: 0.85rem;
             }
         }
+
+        /* =====================================================================
+           REDESIGN 2026 — minimalist & modern
+           Mavjud klass nomlari saqlangan, shuning uchun boshqa bo'limlar ham
+           yangi uslubga avtomatik moslashadi.
+           ===================================================================== */
+        :root {
+            --bg: #09090b;
+            --bg2: #0c0c0f;
+            --bg3: #131317;
+            --card: rgba(255, 255, 255, 0.028);
+            --border: rgba(255, 255, 255, 0.07);
+            --border2: rgba(255, 255, 255, 0.12);
+            --accent: #7c9aff;
+            --accent2: #a78bfa;
+            --green: #4ade80;
+            --red: #fb7185;
+            --amber: #fbbf24;
+            --text1: #f4f4f5;
+            --text2: #a1a1aa;
+            --text3: #63636b;
+            --sidebar-w: 248px;
+            --radius: 12px;
+            --radius-lg: 20px;
+            --ease: cubic-bezier(.22, 1, .36, 1);
+        }
+
+        body {
+            -webkit-font-smoothing: antialiased;
+            letter-spacing: -0.005em;
+        }
+
+        /* nozik ambient yorug'lik — glass effekti uchun fon beradi */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            background:
+                radial-gradient(55% 45% at 88% -8%, rgba(124, 154, 255, .15), transparent 62%),
+                radial-gradient(45% 40% at -5% 105%, rgba(167, 139, 250, .11), transparent 62%);
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, .1); border-radius: 6px }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, .18) }
+
+        /* ---------- Umumiy komponentlar ---------- */
+        .stat-card,
+        .chart-box,
+        .filter-bar,
+        .pay-item {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+        }
+
+        .stat-card::after { display: none }
+        .stat-card:hover { transform: none; border-color: var(--border2) }
+        .pay-item { border-radius: 14px }
+
+        .section-title {
+            font-size: 13.5px;
+            font-weight: 600;
+            color: var(--text1);
+            text-transform: none;
+            letter-spacing: -0.01em;
+        }
+
+        .section-title::before { display: none }
+
+        input, select, textarea {
+            background: rgba(255, 255, 255, .035);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 9px 13px;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: rgba(124, 154, 255, .55);
+            box-shadow: 0 0 0 4px rgba(124, 154, 255, .1);
+        }
+
+        .btn { border-radius: 10px; font-weight: 500; padding: 9px 16px }
+        .btn-primary { background: var(--accent); border-color: var(--accent); color: #0a0d18; font-weight: 600 }
+        .btn-primary:hover { background: #93abff; box-shadow: 0 6px 20px rgba(124, 154, 255, .28); transform: translateY(-1px) }
+        .btn-ghost { background: rgba(255, 255, 255, .035); border-color: var(--border) }
+        .btn-ghost.active { background: rgba(124, 154, 255, .12); color: var(--accent); border-color: rgba(124, 154, 255, .3) }
+
+        .modal-box {
+            background: #0f0f13;
+            border: 1px solid var(--border2);
+            border-radius: 24px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, .55);
+        }
+
+        .modal-backdrop { -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px) }
+
+        /* =====================================================================
+           DASHBOARD
+           ===================================================================== */
+        .dx { max-width: 1240px; margin: 0 auto; animation: dxIn .5s var(--ease) both }
+
+        @keyframes dxIn {
+            from { opacity: 0; transform: translateY(8px) }
+            to { opacity: 1; transform: none }
+        }
+
+        .dx-head {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .dx-eyebrow { font-size: 12.5px; color: var(--text3); font-family: var(--mono); letter-spacing: .01em }
+
+        .dx-title {
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: -0.03em;
+            line-height: 1.15;
+            margin-top: 6px;
+            color: var(--text1);
+        }
+
+        .dx-title span { color: var(--text3) }
+
+        .dx-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, .03);
+            font-size: 12.5px;
+            color: var(--text2);
+            white-space: nowrap;
+        }
+
+        .dx-pill i { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 4px rgba(74, 222, 128, .12) }
+
+        .dx-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 22px 24px;
+            min-width: 0;
+        }
+
+        .dx-top {
+            display: grid;
+            grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+            gap: 16px;
+        }
+
+        .dx-hero {
+            position: relative;
+            overflow: hidden;
+            padding: 28px;
+            background:
+                radial-gradient(90% 120% at 100% 0%, rgba(124, 154, 255, .17), transparent 60%),
+                linear-gradient(180deg, rgba(255, 255, 255, .045), rgba(255, 255, 255, .015));
+            border-color: rgba(255, 255, 255, .09);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 252px;
+        }
+
+        .dx-label { font-size: 13px; color: var(--text2); font-weight: 500 }
+
+        .dx-hero-value {
+            display: flex;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 8px 12px;
+            margin-top: 14px;
+        }
+
+        .dx-big {
+            font-size: clamp(34px, 5vw, 52px);
+            font-weight: 600;
+            letter-spacing: -0.04em;
+            line-height: 1;
+            font-feature-settings: "tnum";
+        }
+
+        .dx-unit { font-size: 15px; color: var(--text3); font-weight: 500 }
+
+        .dx-delta {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: var(--mono);
+        }
+
+        .dx-delta.up { background: rgba(74, 222, 128, .12); color: var(--green) }
+        .dx-delta.down { background: rgba(251, 113, 133, .12); color: var(--red) }
+        .dx-delta.flat { background: rgba(255, 255, 255, .06); color: var(--text2) }
+
+        .dx-hint { margin-top: 10px; font-size: 12.5px; color: var(--text3) }
+
+        .dx-spark { margin-top: 22px; height: 64px; width: 100%; display: block }
+
+        .dx-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 16px }
+
+        .dx-metric {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 18px;
+            padding: 18px 20px;
+            border-radius: 20px;
+            transition: border-color .25s var(--ease), background .25s var(--ease), transform .25s var(--ease);
+        }
+
+        .dx-metric.link { cursor: pointer }
+        .dx-metric.link:hover { border-color: var(--border2); background: rgba(255, 255, 255, .045); transform: translateY(-2px) }
+        .dx-metric.link:active { transform: scale(.985) }
+
+        .dx-metric-top { display: flex; align-items: center; justify-content: space-between; gap: 8px }
+
+        .dx-ico {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            font-size: 13px;
+            background: rgba(255, 255, 255, .05);
+            color: var(--text2);
+            flex-shrink: 0;
+        }
+
+        .dx-ico.green { color: var(--green); background: rgba(74, 222, 128, .1) }
+        .dx-ico.red { color: var(--red); background: rgba(251, 113, 133, .1) }
+        .dx-ico.blue { color: var(--accent); background: rgba(124, 154, 255, .1) }
+        .dx-ico.amber { color: var(--amber); background: rgba(251, 191, 36, .1) }
+
+        .dx-arrow { font-size: 11px; color: var(--text3); transition: transform .25s var(--ease), color .25s }
+        .dx-metric.link:hover .dx-arrow { transform: translate(2px, -2px); color: var(--text2) }
+
+        .dx-metric-val {
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            font-feature-settings: "tnum";
+        }
+
+        .dx-metric-val small { font-size: 12px; color: var(--text3); font-weight: 500; margin-left: 4px; letter-spacing: 0 }
+        .dx-metric-lbl { font-size: 12.5px; color: var(--text2); margin-top: 6px }
+
+        .dx-main {
+            display: grid;
+            grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+            gap: 16px;
+            margin-top: 16px;
+            align-items: start;
+        }
+
+        .dx-card-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px }
+        .dx-card-title { font-size: 15px; font-weight: 600; letter-spacing: -0.02em }
+        .dx-card-sub { font-size: 12.5px; color: var(--text3); margin-top: 3px }
+
+        .dx-year {
+            display: inline-flex;
+            align-items: center;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, .03);
+            padding: 3px;
+        }
+
+        .dx-year button {
+            width: 28px;
+            height: 28px;
+            border: none;
+            border-radius: 50%;
+            background: transparent;
+            color: var(--text2);
+            cursor: pointer;
+            font-size: 11px;
+            transition: background .2s, color .2s;
+        }
+
+        .dx-year button:hover { background: rgba(255, 255, 255, .08); color: var(--text1) }
+        .dx-year b { min-width: 46px; text-align: center; font-size: 12.5px; font-weight: 600; font-family: var(--mono) }
+
+        .dx-chart { height: 280px; position: relative }
+
+        .dx-list { display: flex; flex-direction: column }
+
+        .dx-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 13px 0;
+            border-top: 1px solid var(--border);
+        }
+
+        .dx-row:first-child { border-top: none; padding-top: 2px }
+        .dx-row:last-child { padding-bottom: 2px }
+
+        .dx-avatar {
+            position: relative;
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, .06);
+            border: 1px solid var(--border);
+            display: grid;
+            place-items: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text2);
+            flex-shrink: 0;
+        }
+
+        .dx-avatar::after {
+            content: "";
+            position: absolute;
+            right: -3px;
+            bottom: -3px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--dot, var(--green));
+            border: 2px solid #0e0e11;
+        }
+
+        .dx-row-info { flex: 1; min-width: 0 }
+
+        .dx-row-name {
+            font-size: 13.5px;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .dx-row-sub { font-size: 12px; color: var(--text3); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+        .dx-row-sub em { font-style: normal; color: var(--dot, var(--text3)) }
+
+        .dx-row-amount {
+            font-size: 13.5px;
+            font-weight: 600;
+            color: var(--green);
+            font-family: var(--mono);
+            flex-shrink: 0;
+        }
+
+        .dx-gone {
+            display: inline-block;
+            margin-left: 6px;
+            padding: 1px 7px;
+            border-radius: 999px;
+            background: rgba(251, 113, 133, .12);
+            color: var(--red);
+            font-size: 10.5px;
+            font-weight: 600;
+            vertical-align: middle;
+        }
+
+        .dx-empty { text-align: center; padding: 40px 12px; color: var(--text3); font-size: 13px }
+        .dx-empty i { display: block; font-size: 26px; margin-bottom: 12px; opacity: .6 }
+
+        @media (max-width: 1100px) {
+            .dx-top, .dx-main { grid-template-columns: 1fr }
+            .dx-hero { min-height: 0 }
+        }
+
+        /* =====================================================================
+           SHELL v2 — suzuvchi sidebar · shisha topbar · command palette
+           ===================================================================== */
+        :root {
+            --sb-w: 268px;
+            --tb-h: 64px;
+        }
+
+        html, body { height: 100% }
+
+        body {
+            height: 100dvh;
+            padding: 14px;
+            gap: 14px;
+        }
+
+        kbd {
+            font-family: var(--mono);
+            font-size: 11px;
+            line-height: 1;
+            padding: 3px 6px;
+            border-radius: 7px;
+            background: rgba(255, 255, 255, .07);
+            border: 1px solid var(--border);
+            color: var(--text2);
+        }
+
+        /* ---------- SIDEBAR: "siyoh" panel ---------- */
+        .sidebar {
+            position: relative;
+            width: var(--sb-w);
+            height: 100%;
+            padding: 10px;
+            border-radius: 28px;
+            border: 1px solid rgba(255, 255, 255, .08);
+            background:
+                radial-gradient(120% 55% at 0% 0%, rgba(124, 154, 255, .13), transparent 58%),
+                radial-gradient(90% 40% at 100% 100%, rgba(167, 139, 250, .08), transparent 60%),
+                linear-gradient(180deg, #16161c, #0d0d11);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, .07),
+                0 30px 70px rgba(0, 0, 0, .45);
+            -webkit-backdrop-filter: none;
+            backdrop-filter: none;
+            overflow: hidden;
+            transition: width .4s var(--ease);
+        }
+
+        .sidebar-logo {
+            padding: 8px 8px 14px;
+            min-height: 0;
+            gap: 12px;
+            border: none;
+        }
+
+        .logo-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, .12), 0 8px 20px rgba(0, 0, 0, .35);
+        }
+
+        .logo-icon img { width: 100%; height: 100%; border-radius: 0 }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            font-size: 15.5px;
+            font-weight: 600;
+            letter-spacing: -0.025em;
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        .logo-text small {
+            font-family: var(--mono);
+            font-size: 10.5px;
+            font-weight: 500;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: var(--text3);
+        }
+
+        .close-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, .05);
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            padding: 0;
+        }
+
+        nav {
+            flex: 1;
+            padding: 0;
+            gap: 2px;
+            overflow-x: hidden;
+            overflow-y: auto;
+            scrollbar-width: none;
+        }
+
+        nav::-webkit-scrollbar { display: none }
+
+        .nav-label {
+            padding: 16px 12px 7px;
+            font-family: var(--mono);
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            color: var(--text3);
+            white-space: nowrap;
+        }
+
+        .nav-label:first-child { padding-top: 4px }
+
+        .nav-item {
+            position: relative;
+            height: 46px;
+            padding: 6px;
+            gap: 12px;
+            border: none;
+            border-radius: 16px;
+            color: var(--text2);
+            transition: background .25s var(--ease), color .25s var(--ease);
+        }
+
+        .nav-item i {
+            width: 34px;
+            height: 34px;
+            border-radius: 11px;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            font-size: 13.5px;
+            color: var(--text2);
+            background: rgba(255, 255, 255, .045);
+            transition: background .25s var(--ease), color .25s var(--ease), box-shadow .25s var(--ease), transform .25s var(--ease);
+        }
+
+        .nav-txt { font-size: 13.5px; font-weight: 500; letter-spacing: -0.01em; white-space: nowrap }
+
+        .nav-item:hover { background: rgba(255, 255, 255, .045); color: var(--text1) }
+        .nav-item:hover i { background: rgba(255, 255, 255, .09); color: var(--text1); transform: none }
+        .nav-item:active i { transform: scale(.92) }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, .075);
+            color: #fff;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .07);
+        }
+
+        .nav-item.active i {
+            background: linear-gradient(145deg, #a9bdff, #7c9aff);
+            color: #0a0d18;
+            box-shadow: 0 6px 18px rgba(124, 154, 255, .42), inset 0 1px 0 rgba(255, 255, 255, .55);
+        }
+
+        .nav-badge {
+            margin: 0 8px 0 auto;
+            min-width: 20px;
+            padding: 2px 7px;
+            text-align: center;
+            background: rgba(251, 113, 133, .16);
+            color: var(--red);
+            font-weight: 600;
+            font-family: var(--mono);
+        }
+
+        .sb-collapse {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            height: 40px;
+            padding: 0 6px;
+            margin-top: 6px;
+            border: none;
+            border-radius: 14px;
+            background: transparent;
+            color: var(--text3);
+            font-family: var(--font);
+            font-size: 12.5px;
+            cursor: pointer;
+            transition: background .2s, color .2s;
+        }
+
+        .sb-collapse:hover { background: rgba(255, 255, 255, .05); color: var(--text1) }
+        .sb-collapse i { width: 34px; text-align: center; font-size: 13px; transition: transform .4s var(--ease) }
+
+        .sb-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 8px;
+            padding: 8px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, .045);
+            border: 1px solid var(--border);
+        }
+
+        .sb-ava {
+            width: 38px;
+            height: 38px;
+            border-radius: 13px;
+            flex-shrink: 0;
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+            font-size: 15px;
+            font-weight: 700;
+            color: #0a0d18;
+            background: linear-gradient(135deg, #a9bdff, #c4b5fd);
+        }
+
+        .sb-ava img { width: 100%; height: 100%; object-fit: cover; display: block }
+
+        .sb-user-info { flex: 1; min-width: 0; cursor: pointer }
+        .sb-user-name { font-size: 13px; font-weight: 600; letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+        .sb-user-sub { margin-top: 3px; font-family: var(--mono); font-size: 11px; color: var(--text3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+
+        .sb-logout {
+            width: 34px;
+            height: 34px;
+            flex-shrink: 0;
+            border: none;
+            border-radius: 11px;
+            background: transparent;
+            color: var(--text3);
+            cursor: pointer;
+            transition: background .2s, color .2s;
+        }
+
+        .sb-logout:hover { background: rgba(251, 113, 133, .13); color: var(--red) }
+
+        .sidebar-footer {
+            border: none;
+            padding: 10px 0 2px;
+            font-family: var(--mono);
+            font-size: 10.5px;
+            letter-spacing: .02em;
+            color: var(--text3);
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        /* yig'ilgan (ikonkali) holat — faqat desktop */
+        @media (min-width: 769px) {
+            body.sb-collapsed { --sb-w: 88px }
+
+            body.sb-collapsed .logo-text,
+            body.sb-collapsed .nav-txt,
+            body.sb-collapsed .sb-collapse span,
+            body.sb-collapsed .sb-user-info,
+            body.sb-collapsed .sb-logout,
+            body.sb-collapsed .sidebar-footer { display: none }
+
+            body.sb-collapsed .sidebar-logo { justify-content: center; padding-left: 0; padding-right: 0 }
+
+            body.sb-collapsed .nav-label {
+                height: 1px;
+                padding: 0;
+                margin: 12px 14px 10px;
+                font-size: 0;
+                background: var(--border);
+            }
+
+            body.sb-collapsed .nav-label:first-child { display: none }
+
+            body.sb-collapsed .nav-item { justify-content: center; padding: 6px 0 }
+
+            body.sb-collapsed .nav-badge {
+                position: absolute;
+                top: 2px;
+                right: 6px;
+                margin: 0;
+                min-width: 16px;
+                padding: 1px 5px;
+                font-size: 9px;
+            }
+
+            body.sb-collapsed .sb-collapse { justify-content: center; padding: 0 }
+            body.sb-collapsed .sb-collapse i { transform: rotate(180deg) }
+            body.sb-collapsed .sb-user { justify-content: center; padding: 8px 0; background: transparent; border-color: transparent }
+        }
+
+        /* ---------- TOPBAR: suzuvchi shisha ---------- */
+        .main {
+            position: relative;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .topbar {
+            position: absolute;
+            z-index: 30;
+            top: 0;
+            left: 0;
+            right: 6px;
+            height: var(--tb-h);
+            padding: 0 10px 0 22px;
+            gap: 12px;
+            border-radius: 22px;
+            border: 1px solid rgba(255, 255, 255, .09);
+            background: rgba(20, 20, 26, .55);
+            -webkit-backdrop-filter: blur(24px) saturate(165%);
+            backdrop-filter: blur(24px) saturate(165%);
+            box-shadow:
+                0 12px 32px rgba(0, 0, 0, .3),
+                inset 0 1px 0 rgba(255, 255, 255, .08);
+        }
+
+        .tb-crumb { display: flex; align-items: center; gap: 10px; min-width: 0 }
+        .tb-root { font-size: 13px; font-weight: 500; color: var(--text3); white-space: nowrap }
+        .tb-sep { font-size: 8px; color: var(--text3); opacity: .7 }
+
+        .topbar-title {
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .tb-search {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: min(300px, 30vw);
+            height: 42px;
+            padding: 0 8px 0 14px;
+            border-radius: 15px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, .045);
+            color: var(--text3);
+            font-family: var(--font);
+            font-size: 13px;
+            text-align: left;
+            cursor: pointer;
+            transition: background .2s, border-color .2s, color .2s;
+        }
+
+        .tb-search:hover { background: rgba(255, 255, 255, .08); border-color: var(--border2); color: var(--text2) }
+        .tb-search i { font-size: 13px }
+        .tb-search span { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+
+        .topbar-actions { margin-left: 0; gap: 8px }
+
+        .topbar-stat {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            height: 42px;
+            padding: 0 14px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, .045);
+            border: 1px solid var(--border);
+            color: var(--text2);
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .topbar-stat::before {
+            content: "\f0c0";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            font-size: 11px;
+            color: var(--accent);
+        }
+
+        .topbar #topbar-avatar-inner {
+            height: 42px;
+            padding: 4px 12px 4px 4px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, .045);
+            border: 1px solid var(--border);
+        }
+
+        .topbar #topbar-avatar-inner:hover { background: rgba(255, 255, 255, .09) }
+        .topbar #topbar-avatar-inner img,
+        .topbar #topbar-avatar-inner > div:first-child { border-radius: 11px !important; width: 32px !important; height: 32px !important }
+        .topbar-username { color: var(--text1) !important; font-weight: 500 !important; font-size: 13px !important }
+
+        .menu-btn {
+            width: 42px;
+            height: 42px;
+            padding: 0;
+            border-radius: 15px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, .05);
+            place-items: center;
+        }
+
+        .content {
+            padding: calc(var(--tb-h) + 24px) 0 32px;
+            scrollbar-gutter: stable;
+        }
+
+        /* ---------- COMMAND PALETTE ---------- */
+        .cmdk {
+            position: fixed;
+            inset: 0;
+            z-index: 900;
+            display: none;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 13vh 16px 16px;
+            background: rgba(5, 5, 8, .5);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+        }
+
+        .cmdk.open { display: flex; animation: cmdkBg .25s ease both }
+
+        @keyframes cmdkBg { from { opacity: 0 } to { opacity: 1 } }
+        @keyframes cmdkIn { from { opacity: 0; transform: translateY(-12px) scale(.96) } to { opacity: 1; transform: none } }
+
+        .cmdk-box {
+            width: min(560px, 100%);
+            overflow: hidden;
+            border-radius: 26px;
+            background: rgba(24, 24, 30, .78);
+            -webkit-backdrop-filter: blur(32px) saturate(180%);
+            backdrop-filter: blur(32px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, .13);
+            box-shadow: 0 40px 100px rgba(0, 0, 0, .6), inset 0 1px 0 rgba(255, 255, 255, .1);
+            animation: cmdkIn .4s cubic-bezier(.34, 1.3, .5, 1) both;
+        }
+
+        .cmdk-input { display: flex; align-items: center; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--border) }
+        .cmdk-input > i { color: var(--text3); font-size: 14px }
+
+        .cmdk-input input {
+            flex: 1;
+            min-width: 0;
+            padding: 0;
+            border: none;
+            border-radius: 0;
+            background: none;
+            font-size: 15.5px;
+            color: var(--text1);
+        }
+
+        .cmdk-input input:focus { border: none; box-shadow: none }
+
+        .cmdk-list { max-height: min(50vh, 360px); overflow-y: auto; padding: 8px }
+
+        .cmdk-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 9px 10px;
+            border-radius: 16px;
+            cursor: pointer;
+            color: var(--text2);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .cmdk-item i {
+            width: 34px;
+            height: 34px;
+            border-radius: 11px;
+            display: grid;
+            place-items: center;
+            background: rgba(255, 255, 255, .05);
+            font-size: 13px;
+            transition: background .2s, color .2s;
+        }
+
+        .cmdk-item.sel { background: rgba(255, 255, 255, .07); color: #fff }
+        .cmdk-item.sel i { background: var(--accent); color: #0a0d18 }
+        .cmdk-hint { margin-left: auto; font-family: var(--mono); font-size: 11px; color: var(--text3); font-weight: 400 }
+        .cmdk-empty { padding: 28px; text-align: center; color: var(--text3); font-size: 13px }
+
+        .cmdk-foot { display: flex; align-items: center; gap: 16px; padding: 11px 20px; border-top: 1px solid var(--border); font-size: 11.5px; color: var(--text3) }
+        .cmdk-foot span { display: inline-flex; align-items: center; gap: 6px }
+
+        /* ---------- LIQUID GLASS PASTKI MENYU ---------- */
+        .mobile-bottom-nav {
+            left: 14px;
+            right: 14px;
+            bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+            height: 70px;
+            padding: 6px;
+            gap: 0;
+            border-radius: 35px;
+            border: none;
+            background: rgba(255, 255, 255, .06);
+            -webkit-backdrop-filter: blur(28px) saturate(200%) brightness(1.14);
+            backdrop-filter: blur(28px) saturate(200%) brightness(1.14);
+            box-shadow:
+                0 18px 44px rgba(0, 0, 0, .5),
+                0 3px 10px rgba(0, 0, 0, .3),
+                inset 0 1px 1px rgba(255, 255, 255, .35),
+                inset 0 -1px 1px rgba(255, 255, 255, .08),
+                inset 0 0 28px rgba(255, 255, 255, .04);
+            align-items: stretch;
+            justify-content: stretch;
+            isolation: isolate;
+        }
+
+        /* gradient "rim" — shisha chetidagi yorug' chiziq */
+        .mobile-bottom-nav::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            padding: 1px;
+            border-radius: inherit;
+            pointer-events: none;
+            z-index: 3;
+            background: conic-gradient(from 200deg, rgba(255, 255, 255, .6), rgba(255, 255, 255, .06) 22%, rgba(255, 255, 255, .28) 50%, rgba(255, 255, 255, .06) 76%, rgba(255, 255, 255, .6));
+            -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor;
+            mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+        }
+
+        .mobile-bottom-nav::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            pointer-events: none;
+            z-index: 0;
+            background:
+                radial-gradient(70% 120% at 18% -30%, rgba(255, 255, 255, .22), transparent 60%),
+                linear-gradient(300deg, rgba(255, 255, 255, .07), transparent 30%);
+        }
+
+        .mnav-glider {
+            position: absolute;
+            top: 6px;
+            bottom: 6px;
+            left: 0;
+            width: 0;
+            border-radius: 30px;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0;
+            background: linear-gradient(180deg, rgba(255, 255, 255, .22), rgba(255, 255, 255, .08));
+            border: 1px solid rgba(255, 255, 255, .24);
+            box-shadow:
+                inset 0 1px 1px rgba(255, 255, 255, .5),
+                inset 0 -10px 20px rgba(255, 255, 255, .05),
+                0 8px 22px rgba(0, 0, 0, .3);
+            -webkit-backdrop-filter: blur(6px) brightness(1.22) saturate(150%);
+            backdrop-filter: blur(6px) brightness(1.22) saturate(150%);
+            transition:
+                transform .55s cubic-bezier(.34, 1.36, .5, 1),
+                width .55s cubic-bezier(.34, 1.36, .5, 1),
+                scale .3s cubic-bezier(.34, 1.56, .64, 1),
+                opacity .25s;
+        }
+
+        /* bosib turganda "lupa" kattalashadi */
+        .mobile-bottom-nav.press .mnav-glider { scale: 1.16 1.14 }
+
+        .mobile-nav-item {
+            position: relative;
+            z-index: 2;
+            border-radius: 30px;
+            gap: 5px;
+            color: rgba(255, 255, 255, .6);
+            font-size: 10px;
+            font-weight: 500;
+            transition: color .25s var(--ease);
+        }
+
+        .mobile-nav-item i { font-size: 18px; transition: transform .4s cubic-bezier(.34, 1.56, .64, 1) }
+        .mobile-nav-item.active { color: #fff }
+        .mobile-nav-item.active i { transform: translateY(-1px) scale(1.1) }
+        .mobile-nav-item.active::before { display: none }
+        .mobile-nav-item:active i { transform: scale(.85) }
+
+        @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+            .mobile-bottom-nav { background: rgba(36, 36, 44, .95) }
+        }
+
+        @media (prefers-reduced-transparency: reduce) {
+            .mobile-bottom-nav, .topbar, .cmdk-box { background: rgba(30, 30, 38, .97); -webkit-backdrop-filter: none; backdrop-filter: none }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .mnav-glider, .sidebar, .dx, .cmdk-box { transition: none; animation: none }
+        }
+
+        /* =====================================================================
+           MOBIL (<= 768px)
+           ===================================================================== */
+        @media (max-width: 768px) {
+            body { padding: 0; gap: 0 }
+
+            /* drawer: suzuvchi shisha panel */
+            .sidebar {
+                position: fixed;
+                z-index: 400;
+                left: 10px;
+                top: calc(10px + env(safe-area-inset-top, 0px));
+                bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+                width: min(86vw, 316px);
+                height: auto;
+                border-radius: 30px;
+                transform: translateX(calc(-100% - 28px));
+                transition: transform .6s cubic-bezier(.32, 1.18, .4, 1);
+            }
+
+            .sidebar.open { transform: none }
+
+            .overlay {
+                z-index: 350;
+                background: rgba(4, 4, 8, .5);
+                -webkit-backdrop-filter: blur(8px);
+                backdrop-filter: blur(8px);
+            }
+
+            .menu-btn { display: grid }
+            .close-btn { display: grid }
+
+            .topbar {
+                top: calc(10px + env(safe-area-inset-top, 0px));
+                left: 10px;
+                right: 10px;
+                height: 58px;
+                padding: 0 8px;
+                gap: 10px;
+                border-radius: 22px;
+            }
+
+            .tb-root, .tb-sep, .topbar-stat { display: none }
+            .topbar-title { font-size: 16px }
+
+            .tb-search { width: 42px; padding: 0; justify-content: center; margin-left: auto }
+            .tb-search span, .tb-search kbd { display: none }
+
+            .content {
+                padding: calc(58px + 10px + env(safe-area-inset-top, 0px) + 18px) 14px calc(116px + env(safe-area-inset-bottom, 0px));
+                scrollbar-gutter: auto;
+            }
+
+            .toast-container { bottom: calc(100px + env(safe-area-inset-bottom, 0px)) }
+
+            .cmdk { padding-top: calc(70px + env(safe-area-inset-top, 0px)) }
+            .cmdk-foot { display: none }
+
+            /* dashboard */
+            .dx-head { margin-bottom: 20px; align-items: flex-start }
+            .dx-title { font-size: 23px }
+            .dx-pill { display: none }
+            .dx-card { padding: 18px; border-radius: 22px }
+            .dx-hero { padding: 22px }
+            .dx-top, .dx-metrics, .dx-main { gap: 12px }
+            .dx-main { margin-top: 12px }
+            .dx-metric { padding: 16px; gap: 14px; border-radius: 20px }
+            .dx-metric-val { font-size: 18px }
+            .dx-chart { height: 220px }
+            .dx-spark { height: 52px }
+        }
     </style>
 </head>
 
@@ -1897,34 +2940,53 @@
             </div>
 
             <div class="logo-text">
-                Ferdinant<span>Edu</span>CRM
+                Ferdinant<small>Edu CRM</small>
             </div>
 
-            <button class="close-btn" onclick="closeSidebar()">
+            <button class="close-btn" onclick="closeSidebar()" aria-label="Yopish">
                 <i class="fas fa-times"></i>
             </button>
         </div>
 
         <nav id="nav">
-            <div class="nav-item active" data-page="dashboard"><i class="fas fa-chart-line"></i> Dashboard</div>
-            <div class="nav-item" data-page="groups"><i class="fas fa-layer-group"></i> Guruhlar</div>
-            <div class="nav-item" data-page="courses"><i class="fas fa-graduation-cap"></i> Kurslar</div>
-            <div class="nav-item" data-page="students"><i class="fas fa-user-graduate"></i> O'quvchilar</div>
-            <div class="nav-item" data-page="payments"><i class="fas fa-credit-card"></i> To'lovlar</div>
-            <div class="nav-item" data-page="debtors"><i class="fas fa-user-slash"></i> Qarzdorlar</div>
-            <div class="nav-item" data-page="trash"><i class="fas fa-trash-alt"></i> O'chirilganlar <span
+            <div class="nav-label">Asosiy</div>
+            <div class="nav-item active" data-page="dashboard" title="Dashboard"><i class="fas fa-chart-line"></i><span class="nav-txt">Dashboard</span></div>
+            <div class="nav-item" data-page="groups" title="Guruhlar"><i class="fas fa-layer-group"></i><span class="nav-txt">Guruhlar</span></div>
+            <div class="nav-item" data-page="courses" title="Kurslar"><i class="fas fa-graduation-cap"></i><span class="nav-txt">Kurslar</span></div>
+            <div class="nav-item" data-page="students" title="O'quvchilar"><i class="fas fa-user-graduate"></i><span class="nav-txt">O'quvchilar</span></div>
+
+            <div class="nav-label">Moliya</div>
+            <div class="nav-item" data-page="payments" title="To'lovlar"><i class="fas fa-credit-card"></i><span class="nav-txt">To'lovlar</span></div>
+            <div class="nav-item" data-page="debtors" title="Qarzdorlar"><i class="fas fa-user-slash"></i><span class="nav-txt">Qarzdorlar</span></div>
+
+            <div class="nav-label">Qo'shimcha</div>
+            <div class="nav-item" data-page="tests" title="Testlar"><i class="fas fa-flask"></i><span class="nav-txt">Testlar</span></div>
+            <div class="nav-item" data-page="certificates" title="Sertifikatlar"><i class="fas fa-certificate"></i><span class="nav-txt">Sertifikatlar</span></div>
+            <div class="nav-item" data-page="trash" title="O'chirilganlar"><i class="fas fa-trash-alt"></i><span class="nav-txt">O'chirilganlar</span><span
                     class="nav-badge" id="trash-badge" style="display:none">0</span>
             </div>
-            <div class="nav-item" data-page="tests"><i class="fas fa-flask"></i> Testlar</div>
-            <div class="nav-item" data-page="certificates"><i class="fas fa-certificate"></i> Sertifikatlar</div>
-            <div class="nav-item" data-page="profile"><i class="fas fa-user-circle"></i> Profil</div>
+            <div class="nav-item" data-page="profile" title="Profil"><i class="fas fa-user-circle"></i><span class="nav-txt">Profil</span></div>
         </nav>
+
+        <button class="sb-collapse" id="sbCollapseBtn" onclick="toggleSidebarCollapse()" title="Yig'ish">
+            <i class="fas fa-angles-left"></i><span>Yig'ish</span>
+        </button>
+
+        <div class="sb-user" id="sbUser">
+            <div class="sb-ava" onclick="navigateTo('profile')">U</div>
+            <div class="sb-user-info" onclick="navigateTo('profile')">
+                <div class="sb-user-name">Foydalanuvchi</div>
+                <div class="sb-user-sub">Ferdinant Edu</div>
+            </div>
+            <button class="sb-logout" onclick="confirmLogout()" title="Chiqish" aria-label="Chiqish"><i class="fas fa-right-from-bracket"></i></button>
+        </div>
         <div class="sidebar-footer">Ferdinant Edu CRM &copy; <span id="footer-year"></span></div>
     </div>
 
     <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
 
     <div class="mobile-bottom-nav" id="mobileBottomNav">
+        <div class="mnav-glider" id="mnavGlider"></div>
         <div class="mobile-nav-item active" data-page="dashboard">
             <i class="fas fa-chart-line"></i>
             <span>Dashboard</span>
@@ -1937,16 +2999,27 @@
             <i class="fas fa-credit-card"></i>
             <span>To'lovlar</span>
         </div>
-        <div class="mobile-nav-item" id="mobileMenuBtn" data-page="debtors">
+        <div class="mobile-nav-item" data-page="debtors">
             <i class="fas fa-user-slash"></i>
             <span>Qarzdorlar</span>
+        </div>
+        <div class="mobile-nav-item" id="mobileMenuBtn" onclick="openSidebar()">
+            <i class="fas fa-grip"></i>
+            <span>Menyu</span>
         </div>
     </div>
 
     <div class="main">
         <div class="topbar">
-            <button class="menu-btn" onclick="openSidebar()"><i class="fas fa-bars"></i></button>
-            <div class="topbar-title" id="topbar-title">Dashboard</div>
+            <button class="menu-btn" onclick="openSidebar()" aria-label="Menyu"><i class="fas fa-bars"></i></button>
+            <div class="tb-crumb">
+                <span class="tb-root">Ferdinant</span>
+                <i class="fas fa-chevron-right tb-sep"></i>
+                <div class="topbar-title" id="topbar-title">Dashboard</div>
+            </div>
+            <button class="tb-search" onclick="openCmdk()" aria-label="Qidirish">
+                <i class="fas fa-magnifying-glass"></i><span>Bo'limni qidirish…</span><kbd>Ctrl K</kbd>
+            </button>
             <div class="topbar-actions">
                 <div class="topbar-stat" id="topbar-stat">O'quvchilar: 0</div>
             </div>
@@ -1955,6 +3028,18 @@
     </div>
 
     <div class="toast-container" id="toast-container"></div>
+
+    <div class="cmdk" id="cmdk">
+        <div class="cmdk-box">
+            <div class="cmdk-input">
+                <i class="fas fa-magnifying-glass"></i>
+                <input id="cmdkInput" placeholder="Qayerga o'tamiz?" autocomplete="off" spellcheck="false">
+                <kbd>Esc</kbd>
+            </div>
+            <div class="cmdk-list" id="cmdkList"></div>
+            <div class="cmdk-foot"><span><kbd>↑</kbd><kbd>↓</kbd> tanlash</span><span><kbd>↵</kbd> ochish</span></div>
+        </div>
+    </div>
 
     <!-- MODALS (CRM uchun) -->
     <div class="modal-backdrop" id="group-modal">
@@ -2664,6 +3749,8 @@
             document.querySelectorAll(".mobile-nav-item[data-page]").forEach(n => {
                 n.classList.toggle("active", n.dataset.page === page);
             });
+            if (typeof updateNavGlider === "function") updateNavGlider();
+            if (typeof refreshSidebarUser === "function") refreshSidebarUser();
         }
 
         function navigateTo(page) {
@@ -2760,32 +3847,151 @@
 
         // ===================== DASHBOARD =====================
         function renderDashboard() {
-            const income = payments.filter(p => paidMonthUz(p) === curMonth() && paidYear(p) === curYear()).reduce((s, p) => s + p.amount, 0);
+            const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+            const sumBy = (month, year) => payments
+                .filter(p => paidMonthUz(p) === month && paidYear(p) === year)
+                .reduce((s, p) => s + p.amount, 0);
+
+            const nowD = now();
+            const monthIdx = nowD.getMonth();
+            const year = curYear();
+
+            const income = sumBy(curMonth(), year);
+            const prevIdx = (monthIdx + 11) % 12;
+            const prevIncome = sumBy(MONTHS_UZ[prevIdx], monthIdx === 0 ? year - 1 : year);
             const totalIncome = payments.reduce((s, p) => s + p.amount, 0);
             const totalDebt = students.reduce((s, st) => s + st.debt_amount, 0);
             const debtors = students.filter(s => s.debt_amount > 0).length;
-            const recentPays = payments.filter(p => paidMonthUz(p) === curMonth() && paidYear(p) === curYear()).sort((a, b) => b.id - a.id).slice(0, 8);
+            const recentPays = payments
+                .filter(p => paidMonthUz(p) === curMonth() && paidYear(p) === year)
+                .sort((a, b) => b.id - a.id)
+                .slice(0, 8);
+
+            // --- salomlashuv ---
+            const hour = nowD.getHours();
+            const greet = hour < 12 ? "Xayrli tong" : hour < 18 ? "Xayrli kun" : "Xayrli kech";
+            const u = (typeof getCurrentUserData === "function") ? getCurrentUserData() : null;
+            const uName = u ? (u.name || u.username || "") : "";
+            const dateStr = `${nowD.getDate()} ${curMonth()}, ${year}`;
+
+            // --- o'tgan oyga nisbatan o'zgarish ---
+            let deltaHtml = `<span class="dx-delta flat">— yangi oy</span>`;
+            if (prevIncome > 0) {
+                const pct = Math.round(((income - prevIncome) / prevIncome) * 100);
+                const cls = pct > 0 ? "up" : pct < 0 ? "down" : "flat";
+                const arrow = pct > 0 ? "↑" : pct < 0 ? "↓" : "→";
+                deltaHtml = `<span class="dx-delta ${cls}">${arrow} ${Math.abs(pct)}%</span>`;
+            }
+
+            // --- mini grafik (sparkline) ---
+            const monthly = MONTHS_UZ.slice(0, monthIdx + 1).map(m => sumBy(m, year));
+            let spark = "";
+            if (monthly.length > 1 && Math.max(...monthly) > 0) {
+                const W = 300, H = 64, max = Math.max(...monthly);
+                const pts = monthly.map((v, i) => [(i * W) / (monthly.length - 1), H - 6 - (v / max) * (H - 14)]);
+                const line = pts.map((p, i) => `${i ? "L" : "M"}${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(" ");
+                const last = pts[pts.length - 1];
+                spark = `<svg class="dx-spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">
+                    <defs><linearGradient id="dxg" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0" stop-color="#7c9aff" stop-opacity=".32"/><stop offset="1" stop-color="#7c9aff" stop-opacity="0"/>
+                    </linearGradient></defs>
+                    <path d="${line} L${W},${H} L0,${H} Z" fill="url(#dxg)"/>
+                    <path d="${line}" fill="none" stroke="#7c9aff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+                    <circle cx="${last[0]}" cy="${last[1]}" r="3.5" fill="#7c9aff" vector-effect="non-scaling-stroke"/>
+                </svg>`;
+            }
+
+            // --- oxirgi to'lovlar ---
+            const rows = recentPays.map(p => {
+                const st = students.find(s => s.id === p.student);
+                const name = st?.name || p.student_name_snapshot || "Noma'lum";
+                const ini = (name.trim().split(/\s+/).slice(0, 2).map(w => w[0] || "").join("") || "?").toUpperCase();
+                let dot = "var(--green)", status = "To'liq to'langan";
+                if (st?.debt_amount > 0) {
+                    if (st.paid_amount > 0) { dot = "var(--amber)"; status = fmtFull(st.debt_amount) + " so'm qarz"; }
+                    else { dot = "var(--red)"; status = "To'liq qarzdor"; }
+                }
+                return `<div class="dx-row" style="--dot:${dot}">
+                    <div class="dx-avatar">${esc(ini)}</div>
+                    <div class="dx-row-info">
+                        <div class="dx-row-name">${esc(name)}${!st ? `<span class="dx-gone">O'chirilgan</span>` : ""}</div>
+                        <div class="dx-row-sub">${esc(p.month)} ${esc(p.year)} · ${esc(p.date)} · <em>${esc(status)}</em></div>
+                    </div>
+                    <div class="dx-row-amount">+${fmt(p.amount)}</div>
+                </div>`;
+            }).join("");
 
             document.getElementById("content").innerHTML = `
-        <div class="stats-row">
-            <div class="stat-card"><div class="stat-icon blue"><i class="fas fa-calendar-alt"></i></div><div class="stat-val sm">${fmt(income)} so'm</div><div class="stat-lbl">${curMonth()} oyi tushumi</div></div>
-            <div class="stat-card"><div class="stat-icon green"><i class="fas fa-coins"></i></div><div class="stat-val sm">${fmt(totalIncome)} so'm</div><div class="stat-lbl">Jami tushum</div></div>
-            <div class="stat-card" style="cursor:pointer" onclick="navigateTo('debtors')" title="Qarzdorlar bo'limiga o'tish"><div class="stat-icon red"><i class="fas fa-exclamation-triangle"></i></div><div class="stat-val sm">${fmt(totalDebt)} so'm</div><div class="stat-lbl">Jami qarzdorlik</div></div>
-            <div class="stat-card" style="cursor:pointer" onclick="navigateTo('students')" title="O'quvchilar bo'limiga o'tish"><div class="stat-icon amber"><i class="fas fa-users"></i></div><div class="stat-val">${students.length}</div><div class="stat-lbl">Jami o'quvchilar</div></div>
-            <div class="stat-card" style="cursor:pointer" onclick="navigateTo('debtors')" title="Qarzdorlar bo'limiga o'tish"><div class="stat-icon purple"><i class="fas fa-user-slash"></i></div><div class="stat-val">${debtors}</div><div class="stat-lbl">Qarzdorlar</div></div>
-        </div>
-        <div class="chart-box">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-                <div class="section-title" style="margin-bottom:0">Oylik to'lov grafigi</div>
-                <input type="number" id="chart-year" value="${chartYear}" style="width:90px" onchange="chartYear=parseInt(this.value);renderDashboard()">
+        <div class="dx">
+            <div class="dx-head">
+                <div>
+                    <div class="dx-eyebrow">${dateStr}</div>
+                    <div class="dx-title">${greet}${uName ? `, <span>${esc(uName)}</span>` : ""}</div>
+                </div>
+                <div class="dx-pill"><i></i>${curMonth()} oyi</div>
             </div>
-            <div style="height:200px"><canvas id="main-chart"></canvas></div>
-        </div>
-        <div class="chart-box"><div class="section-title">Oxirgi to'lovlar</div>${recentPays.length ? recentPays.map(p => {
-                const st = students.find(s => s.id === p.student);
-                const displayName = st?.name || p.student_name_snapshot || "Noma'lum";
-                return `<div class="pay-item"><div class="pay-dot" style="background:${st?.debt_amount > 0 ? (st.paid_amount > 0 ? 'var(--amber)' : 'var(--red)') : 'var(--green)'}"></div><div class="pay-info"><div class="pay-name">${displayName}${!st ? ' <span style="background:rgba(239,68,68,0.12);color:var(--red);padding:1px 8px;border-radius:20px;font-size:11px;font-weight:600;vertical-align:middle">O\'chirilgan</span>' : ''}</div><div class="pay-date">${p.month} ${p.year} · ${p.date}</div><div class="pay-sub">💰 To'langan: ${fmt(p.amount)} | 📌 ${st?.debt_amount > 0 ? (st.paid_amount > 0 ? fmtFull(st.debt_amount) + " so'm qarz" : "To'liq qarzdor") : "To'liq to'langan"}</div></div><div class="pay-amount">+${fmt(p.amount)}</div></div>`;
-            }).join("") : `<div class="empty"><i class="fas fa-receipt"></i><p>Hali to'lov yo'q</p></div>`}</div>`;
+
+            <div class="dx-top">
+                <div class="dx-card dx-hero">
+                    <div>
+                        <div class="dx-label">${curMonth()} oyi tushumi</div>
+                        <div class="dx-hero-value">
+                            <span class="dx-big">${fmt(income)}</span>
+                            <span class="dx-unit">so'm</span>
+                            ${deltaHtml}
+                        </div>
+                        <div class="dx-hint">${prevIncome > 0 ? `O'tgan oy: ${fmt(prevIncome)} so'm` : "O'tgan oy uchun ma'lumot yo'q"}</div>
+                    </div>
+                    ${spark}
+                </div>
+
+                <div class="dx-metrics">
+                    <div class="dx-card dx-metric">
+                        <div class="dx-metric-top"><div class="dx-ico green"><i class="fas fa-coins"></i></div></div>
+                        <div><div class="dx-metric-val">${fmt(totalIncome)}<small>so'm</small></div><div class="dx-metric-lbl">Jami tushum</div></div>
+                    </div>
+                    <div class="dx-card dx-metric link" onclick="navigateTo('debtors')" title="Qarzdorlar bo'limiga o'tish">
+                        <div class="dx-metric-top"><div class="dx-ico red"><i class="fas fa-triangle-exclamation"></i></div><i class="fas fa-arrow-up-right-from-square dx-arrow"></i></div>
+                        <div><div class="dx-metric-val">${fmt(totalDebt)}<small>so'm</small></div><div class="dx-metric-lbl">Jami qarzdorlik</div></div>
+                    </div>
+                    <div class="dx-card dx-metric link" onclick="navigateTo('students')" title="O'quvchilar bo'limiga o'tish">
+                        <div class="dx-metric-top"><div class="dx-ico blue"><i class="fas fa-users"></i></div><i class="fas fa-arrow-up-right-from-square dx-arrow"></i></div>
+                        <div><div class="dx-metric-val">${students.length}</div><div class="dx-metric-lbl">Jami o'quvchilar</div></div>
+                    </div>
+                    <div class="dx-card dx-metric link" onclick="navigateTo('debtors')" title="Qarzdorlar bo'limiga o'tish">
+                        <div class="dx-metric-top"><div class="dx-ico amber"><i class="fas fa-user-clock"></i></div><i class="fas fa-arrow-up-right-from-square dx-arrow"></i></div>
+                        <div><div class="dx-metric-val">${debtors}</div><div class="dx-metric-lbl">Qarzdorlar</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dx-main">
+                <div class="dx-card">
+                    <div class="dx-card-head">
+                        <div>
+                            <div class="dx-card-title">Oylik to'lovlar</div>
+                            <div class="dx-card-sub">${chartYear}-yil bo'yicha tushum dinamikasi</div>
+                        </div>
+                        <div class="dx-year">
+                            <button onclick="chartYear--;renderDashboard()" aria-label="Oldingi yil"><i class="fas fa-chevron-left"></i></button>
+                            <b>${chartYear}</b>
+                            <button onclick="chartYear++;renderDashboard()" aria-label="Keyingi yil"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                    <div class="dx-chart"><canvas id="main-chart"></canvas></div>
+                </div>
+
+                <div class="dx-card">
+                    <div class="dx-card-head">
+                        <div>
+                            <div class="dx-card-title">Oxirgi to'lovlar</div>
+                            <div class="dx-card-sub">${curMonth()} oyi</div>
+                        </div>
+                    </div>
+                    <div class="dx-list">${rows || `<div class="dx-empty"><i class="fas fa-receipt"></i>Hali to'lov yo'q</div>`}</div>
+                </div>
+            </div>
+        </div>`;
             setTimeout(() => buildChart(), 80);
         }
 
@@ -2793,6 +3999,12 @@
             const ctx = document.getElementById("main-chart");
             if (!ctx) return;
             const data = MONTHS_UZ.map(m => payments.filter(p => paidMonthUz(p) === m && paidYear(p) === chartYear).reduce((s, p) => s + p.amount, 0));
+            const isCurYear = chartYear === curYear();
+            const curIdx = now().getMonth();
+            const base = "rgba(255,255,255,0.12)";
+            const hi = "#7c9aff";
+            const colors = data.map((_, i) => (isCurYear && i === curIdx) ? hi : base);
+            const hoverColors = data.map((_, i) => (isCurYear && i === curIdx) ? "#a9bdff" : "rgba(124,154,255,0.55)");
             if (chartInstance) chartInstance.destroy();
             chartInstance = new Chart(ctx, {
                 type: "bar",
@@ -2801,19 +4013,222 @@
                     datasets: [{
                         label: `${chartYear}`,
                         data,
-                        backgroundColor: "rgba(59,130,246,0.25)",
-                        borderColor: "#3b82f6",
-                        borderRadius: 6
+                        backgroundColor: colors,
+                        hoverBackgroundColor: hoverColors,
+                        borderWidth: 0,
+                        borderRadius: 8,
+                        borderSkipped: false,
+                        maxBarThickness: 34,
+                        categoryPercentage: 0.8,
+                        barPercentage: 0.78
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { ticks: { callback: v => fmt(v) } } }
+                    animation: { duration: 700, easing: "easeOutQuart" },
+                    interaction: { mode: "index", intersect: false },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: "rgba(20,20,24,0.92)",
+                            borderColor: "rgba(255,255,255,0.12)",
+                            borderWidth: 1,
+                            padding: 12,
+                            cornerRadius: 12,
+                            displayColors: false,
+                            titleColor: "#a1a1aa",
+                            bodyColor: "#f4f4f5",
+                            titleFont: { size: 11, weight: "500" },
+                            bodyFont: { size: 14, weight: "600" },
+                            callbacks: { label: c => `${fmtFull(c.parsed.y)} so'm` }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            border: { display: false },
+                            ticks: { color: "#63636b", font: { size: 11 } }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: "rgba(255,255,255,0.05)" },
+                            border: { display: false },
+                            ticks: { color: "#63636b", font: { size: 11 }, maxTicksLimit: 5, padding: 8, callback: v => fmt(v) }
+                        }
+                    }
                 }
             });
         }
+
+        // Mobil pastki "liquid glass" menyudagi sirpanuvchi shisha indikator
+        function updateNavGlider() {
+            const nav = document.getElementById("mobileBottomNav");
+            const g = document.getElementById("mnavGlider");
+            if (!nav || !g) return;
+            const a = nav.querySelector(".mobile-nav-item.active");
+            if (!a || !a.offsetWidth) { g.style.opacity = "0"; return; }
+            const first = !g.dataset.init;
+            if (first) g.style.transition = "none";
+            g.style.width = a.offsetWidth + "px";
+            g.style.transform = `translateX(${a.offsetLeft}px)`;
+            g.style.opacity = "1";
+            if (first) { void g.offsetWidth; g.style.transition = ""; g.dataset.init = "1"; }
+        }
+        window.addEventListener("resize", updateNavGlider);
+        window.addEventListener("load", () => setTimeout(updateNavGlider, 60));
+
+
+        // ===================== SHELL v2: sidebar, command palette =====================
+        const SB_KEY = "ferdinant_sb_collapsed";
+        try { if (localStorage.getItem(SB_KEY) === "1") document.body.classList.add("sb-collapsed"); } catch (e) { }
+
+        function toggleSidebarCollapse() {
+            const c = document.body.classList.toggle("sb-collapsed");
+            try { localStorage.setItem(SB_KEY, c ? "1" : "0"); } catch (e) { }
+            const b = document.getElementById("sbCollapseBtn");
+            if (b) b.title = c ? "Yoyish" : "Yig'ish";
+            // grafik yangi kenglikka moslashsin
+            setTimeout(() => { if (typeof chartInstance !== "undefined" && chartInstance) chartInstance.resize(); }, 420);
+        }
+
+        // Sidebar pastidagi foydalanuvchi kartasi (auth-guard'dagi profil ma'lumotidan)
+        function refreshSidebarUser() {
+            const box = document.getElementById("sbUser");
+            if (!box) return;
+            let name = "", user = "", avatar = "";
+            try {
+                const p = (typeof getProfile === "function") ? getProfile() : {};
+                name = p.name || "";
+                avatar = p.avatar || "";
+                user = (typeof getCurrentUser === "function") ? getCurrentUser() : "";
+            } catch (e) { }
+            const shown = name || user || "Foydalanuvchi";
+            const ava = box.querySelector(".sb-ava");
+            ava.textContent = "";
+            if (avatar) {
+                const img = document.createElement("img");
+                img.src = avatar;
+                img.alt = "";
+                ava.appendChild(img);
+            } else {
+                ava.textContent = (shown[0] || "U").toUpperCase();
+            }
+            box.querySelector(".sb-user-name").textContent = shown;
+            box.querySelector(".sb-user-sub").textContent = user ? "@" + user : "Ferdinant Edu";
+        }
+
+        window.addEventListener("load", () => {
+            // profil o'zgarganda sidebar kartasi ham yangilansin
+            if (typeof window.updateTopbarAvatar === "function" && !window.updateTopbarAvatar.__sbWrapped) {
+                const orig = window.updateTopbarAvatar;
+                window.updateTopbarAvatar = function () {
+                    const r = orig.apply(this, arguments);
+                    refreshSidebarUser();
+                    return r;
+                };
+                window.updateTopbarAvatar.__sbWrapped = true;
+            }
+            refreshSidebarUser();
+            setTimeout(refreshSidebarUser, 1500);
+            const isMac = /Mac|iPhone|iPad/.test(navigator.platform || "");
+            const k = document.querySelector(".tb-search kbd");
+            if (k) k.textContent = isMac ? "⌘ K" : "Ctrl K";
+        });
+
+        // ---------- Command palette (Ctrl/⌘ + K) ----------
+        const CMDK_ICONS = {
+            dashboard: "fa-chart-line", groups: "fa-layer-group", courses: "fa-graduation-cap",
+            students: "fa-user-graduate", payments: "fa-credit-card", debtors: "fa-user-slash",
+            trash: "fa-trash-alt", tests: "fa-flask", certificates: "fa-certificate", profile: "fa-user-circle"
+        };
+        let cmdkItems = [], cmdkSel = 0;
+
+        function cmdkBuild(q) {
+            q = (q || "").trim().toLowerCase();
+            const all = Object.keys(pageTitles).map(k => ({
+                type: "page", key: k, label: pageTitles[k], icon: CMDK_ICONS[k] || "fa-circle",
+                hint: k === currentPage ? "Hozirgi" : "Bo'lim"
+            }));
+            all.push({ type: "logout", label: "Tizimdan chiqish", icon: "fa-right-from-bracket", hint: "Amal" });
+            cmdkItems = q ? all.filter(i => i.label.toLowerCase().includes(q)) : all;
+            cmdkSel = 0;
+            cmdkRender();
+        }
+
+        function cmdkRender() {
+            const list = document.getElementById("cmdkList");
+            if (!list) return;
+            list.innerHTML = cmdkItems.length
+                ? cmdkItems.map((it, i) => `<div class="cmdk-item ${i === cmdkSel ? "sel" : ""}" data-i="${i}"><i class="fas ${it.icon}"></i><span>${it.label}</span><span class="cmdk-hint">${it.hint}</span></div>`).join("")
+                : `<div class="cmdk-empty">Hech narsa topilmadi</div>`;
+            const s = list.querySelector(".sel");
+            if (s) s.scrollIntoView({ block: "nearest" });
+        }
+
+        function openCmdk() {
+            const el = document.getElementById("cmdk");
+            if (!el) return;
+            el.classList.add("open");
+            const inp = document.getElementById("cmdkInput");
+            inp.value = "";
+            cmdkBuild("");
+            setTimeout(() => inp.focus(), 30);
+        }
+
+        function closeCmdk() {
+            const el = document.getElementById("cmdk");
+            if (el) el.classList.remove("open");
+        }
+
+        function cmdkRun(it) {
+            if (!it) return;
+            closeCmdk();
+            if (it.type === "page") navigateTo(it.key);
+            else if (it.type === "logout" && typeof confirmLogout === "function") confirmLogout();
+        }
+
+        (function initCmdk() {
+            const el = document.getElementById("cmdk");
+            const inp = document.getElementById("cmdkInput");
+            const list = document.getElementById("cmdkList");
+            if (!el || !inp || !list) return;
+            el.addEventListener("mousedown", e => { if (e.target === el) closeCmdk(); });
+            inp.addEventListener("input", () => cmdkBuild(inp.value));
+            inp.addEventListener("keydown", e => {
+                if (e.key === "ArrowDown") { e.preventDefault(); if (cmdkItems.length) { cmdkSel = (cmdkSel + 1) % cmdkItems.length; cmdkRender(); } }
+                else if (e.key === "ArrowUp") { e.preventDefault(); if (cmdkItems.length) { cmdkSel = (cmdkSel - 1 + cmdkItems.length) % cmdkItems.length; cmdkRender(); } }
+                else if (e.key === "Enter") { e.preventDefault(); cmdkRun(cmdkItems[cmdkSel]); }
+                else if (e.key === "Escape") { e.preventDefault(); closeCmdk(); }
+            });
+            list.addEventListener("click", e => {
+                const row = e.target.closest(".cmdk-item");
+                if (row) cmdkRun(cmdkItems[+row.dataset.i]);
+            });
+            list.addEventListener("mousemove", e => {
+                const row = e.target.closest(".cmdk-item");
+                if (row && +row.dataset.i !== cmdkSel) {
+                    cmdkSel = +row.dataset.i;
+                    list.querySelectorAll(".cmdk-item").forEach((n, i) => n.classList.toggle("sel", i === cmdkSel));
+                }
+            });
+            document.addEventListener("keydown", e => {
+                if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey && e.key.toLowerCase() === "k") {
+                    e.preventDefault();
+                    el.classList.contains("open") ? closeCmdk() : openCmdk();
+                }
+            });
+        })();
+
+        // Pastki "liquid glass" menyu: bosganda shisha indikator "lupa"dek kattalashadi
+        (function initNavPress() {
+            const nav = document.getElementById("mobileBottomNav");
+            if (!nav) return;
+            const on = () => nav.classList.add("press");
+            const off = () => nav.classList.remove("press");
+            nav.addEventListener("pointerdown", on);
+            ["pointerup", "pointercancel", "pointerleave"].forEach(ev => nav.addEventListener(ev, off));
+        })();
 
         // ===================== GROUPS =====================
         function renderGroups() {
