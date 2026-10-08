@@ -7437,15 +7437,9 @@
     if (document.querySelector('link[rel="manifest"]')) return;
     var base = location.origin + location.pathname.replace(/[^\/]*$/, '');
     var m = {
-      id: base,
-      name: APP_NAME,
-      short_name: 'Ferdinant',
-      start_url: base,
-      scope: base,
-      display: 'standalone',
-      background_color: '#06080f',
-      theme_color: '#1e2327',
-      icons: icons
+      id: base, name: APP_NAME, short_name: 'Ferdinant',
+      start_url: base, scope: base, display: 'standalone',
+      background_color: '#06080f', theme_color: '#1e2327', icons: icons
     };
     var l = document.createElement('link');
     l.rel = 'manifest';
@@ -7463,32 +7457,128 @@
   };
   img.src = LOGO;
 
-  // ---- 2) Tugma ----
+  // ---- 2) "Chulp" ovozi (fayl kerak emas, brauzer o'zi hosil qiladi) ----
+  var audioCtx = null;
+  function playChulp() {
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      audioCtx = audioCtx || new AC();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      var t = audioCtx.currentTime;
+
+      function bubble(start, f0, f1, dur, vol) {
+        var o = audioCtx.createOscillator();
+        var g = audioCtx.createGain();
+        o.type = 'sine';
+        o.frequency.setValueAtTime(f0, start);
+        o.frequency.exponentialRampToValueAtTime(f1, start + dur * 0.7);
+        g.gain.setValueAtTime(0.0001, start);
+        g.gain.exponentialRampToValueAtTime(vol, start + 0.012);
+        g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+        o.connect(g); g.connect(audioCtx.destination);
+        o.start(start); o.stop(start + dur + 0.02);
+      }
+      // "chul" — pastdan tepaga sakragan tomchi
+      bubble(t, 260, 900, 0.14, 0.38);
+      // "p" — qisqa yuqori pufak
+      bubble(t + 0.075, 1300, 700, 0.09, 0.2);
+
+      // juda qisqa "ch" shovqini
+      var len = Math.floor(audioCtx.sampleRate * 0.03);
+      var buf = audioCtx.createBuffer(1, len, audioCtx.sampleRate);
+      var d = buf.getChannelData(0);
+      for (var i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
+      var ns = audioCtx.createBufferSource();
+      var ng = audioCtx.createGain();
+      var bp = audioCtx.createBiquadFilter();
+      bp.type = 'bandpass'; bp.frequency.value = 2500;
+      ng.gain.value = 0.12;
+      ns.buffer = buf;
+      ns.connect(bp); bp.connect(ng); ng.connect(audioCtx.destination);
+      ns.start(t);
+    } catch (e) { /* ovoz bo'lmasa ham tugma ishlayveradi */ }
+  }
+
+  // ---- 3) Dizayn ----
   var st = document.createElement('style');
   st.textContent =
-    '#pwa-install-btn{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:1000001;' +
-    'display:none;align-items:center;gap:8px;padding:12px 18px;border:none;border-radius:999px;background:#2563eb;color:#fff;' +
-    'font:600 14px "Geist",system-ui,-apple-system,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.35);cursor:pointer}' +
-    '#pwa-install-btn:hover{background:#1d4ed8}' +
-    '@media (max-width:900px){#pwa-install-btn{bottom:calc(84px + env(safe-area-inset-bottom,0px))}}' +
-    '#auth-overlay ~ #pwa-install-btn{bottom:calc(16px + env(safe-area-inset-bottom,0px))}';
+    '@keyframes pwaIn{0%{opacity:0;transform:translateY(40px) scale(.7)}60%{opacity:1;transform:translateY(-6px) scale(1.04)}100%{opacity:1;transform:translateY(0) scale(1)}}' +
+    '@keyframes pwaPulse{0%{box-shadow:0 10px 30px rgba(59,130,246,.35),0 0 0 0 rgba(99,102,241,.55)}70%{box-shadow:0 10px 30px rgba(59,130,246,.35),0 0 0 14px rgba(99,102,241,0)}100%{box-shadow:0 10px 30px rgba(59,130,246,.35),0 0 0 0 rgba(99,102,241,0)}}' +
+    '@keyframes pwaShine{0%{left:-70%}55%,100%{left:140%}}' +
+    '@keyframes pwaArrow{0%,100%{transform:translateY(-2px)}50%{transform:translateY(3px)}}' +
+    '@keyframes pwaPop{0%{transform:scale(1)}25%{transform:scale(.88,.8)}55%{transform:scale(1.1,1.14)}80%{transform:scale(.97)}100%{transform:scale(1)}}' +
+    '@keyframes pwaRip{from{transform:translate(-50%,-50%) scale(0);opacity:.55}to{transform:translate(-50%,-50%) scale(1);opacity:0}}' +
+    '@keyframes pwaFade{from{opacity:0}to{opacity:1}}' +
+    '@keyframes pwaCard{from{opacity:0;transform:translateY(24px) scale(.94)}to{opacity:1;transform:none}}' +
+
+    '#pwa-install-btn{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:1000001;' +
+    'display:none;align-items:center;gap:12px;padding:8px 18px 8px 8px;margin:0;cursor:pointer;overflow:hidden;' +
+    'border:1.5px solid transparent;border-radius:999px;color:#f1f5f9;text-align:left;-webkit-tap-highlight-color:transparent;' +
+    'font-family:var(--font,"Geist",-apple-system,system-ui,sans-serif);' +
+    'background:linear-gradient(rgba(13,17,23,.94),rgba(13,17,23,.94)) padding-box,linear-gradient(135deg,#3b82f6,#6366f1 55%,#10b981) border-box;' +
+    'backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);' +
+    'box-shadow:0 10px 30px rgba(59,130,246,.35);' +
+    'animation:pwaIn .75s cubic-bezier(.2,1,.3,1) both,pwaPulse 2.8s 1.2s infinite;' +
+    'transition:transform .22s cubic-bezier(.2,1.2,.4,1),filter .2s}' +
+    '#pwa-install-btn::before{content:"";position:absolute;top:0;left:-70%;width:38%;height:100%;pointer-events:none;' +
+    'background:linear-gradient(100deg,transparent,rgba(255,255,255,.2),transparent);transform:skewX(-20deg);animation:pwaShine 4s 1.6s infinite}' +
+    '#pwa-install-btn:hover{transform:translateY(-3px) scale(1.04);filter:brightness(1.12)}' +
+    '#pwa-install-btn:active{transform:scale(.94)}' +
+    '#pwa-install-btn.pwa-pop{animation:pwaPop .55s ease both}' +
+
+    '#pwa-install-btn .pwa-ic{flex:none;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:#fff;' +
+    'background:linear-gradient(135deg,#3b82f6,#6366f1);box-shadow:0 4px 14px rgba(99,102,241,.55)}' +
+    '#pwa-install-btn .pwa-ic svg{width:20px;height:20px;animation:pwaArrow 1.6s ease-in-out infinite}' +
+    '#pwa-install-btn:hover .pwa-ic svg{animation-duration:.7s}' +
+    '#pwa-install-btn .pwa-tx{display:flex;flex-direction:column;line-height:1.2;position:relative}' +
+    '#pwa-install-btn .pwa-t1{font-size:14px;font-weight:600;letter-spacing:.1px;color:#f1f5f9}' +
+    '#pwa-install-btn .pwa-t2{font-size:11.5px;font-weight:400;color:#94a3b8;margin-top:2px}' +
+    '#pwa-install-btn .pwa-x{position:relative;flex:none;width:22px;height:22px;margin-left:2px;border-radius:50%;display:grid;place-items:center;' +
+    'font-size:15px;line-height:1;color:#64748b;transition:background .2s,color .2s}' +
+    '#pwa-install-btn .pwa-x:hover{background:rgba(255,255,255,.1);color:#f1f5f9}' +
+    '#pwa-install-btn .pwa-rip{position:absolute;width:260px;height:260px;border-radius:50%;pointer-events:none;' +
+    'background:radial-gradient(circle,rgba(99,102,241,.6),rgba(59,130,246,0) 70%);animation:pwaRip .7s ease-out forwards}' +
+
+    '@media (max-width:900px){#pwa-install-btn{bottom:calc(88px + env(safe-area-inset-bottom,0px));right:14px}}' +
+    '@media (max-width:380px){#pwa-install-btn .pwa-t2{display:none}}' +
+    '#auth-overlay ~ #pwa-install-btn{bottom:calc(18px + env(safe-area-inset-bottom,0px))}' +
+    '@media (prefers-reduced-motion:reduce){#pwa-install-btn,#pwa-install-btn *{animation:none!important}}' +
+
+    '.pwa-modal{position:fixed;inset:0;z-index:1000002;display:flex;align-items:center;justify-content:center;padding:20px;' +
+    'background:rgba(6,8,15,.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);animation:pwaFade .25s both}' +
+    '.pwa-card{width:100%;max-width:370px;padding:22px;border-radius:18px;color:#f1f5f9;' +
+    'font:14.5px/1.65 var(--font,"Geist",-apple-system,system-ui,sans-serif);' +
+    'background:linear-gradient(#0d1117,#0d1117) padding-box,linear-gradient(135deg,#3b82f6,#6366f1 55%,#10b981) border-box;' +
+    'border:1.5px solid transparent;box-shadow:0 24px 60px rgba(0,0,0,.6);animation:pwaCard .4s cubic-bezier(.2,1.1,.3,1) both}' +
+    '.pwa-card b{color:#fff}.pwa-card .pwa-h{font-size:16px;font-weight:700;margin-bottom:8px}' +
+    '.pwa-card .pwa-ok{margin-top:16px;width:100%;padding:11px;border:none;border-radius:12px;cursor:pointer;color:#fff;font:600 14px inherit;' +
+    'background:linear-gradient(135deg,#3b82f6,#6366f1);transition:transform .15s,filter .2s}' +
+    '.pwa-card .pwa-ok:hover{filter:brightness(1.12)}.pwa-card .pwa-ok:active{transform:scale(.96)}';
   document.head.appendChild(st);
 
   var btn = document.createElement('button');
   btn.id = 'pwa-install-btn';
   btn.type = 'button';
-  btn.innerHTML = '<span style="font-size:16px">📲</span><span>Ilovani yuklab olish</span>';
+  btn.setAttribute('aria-label', 'Ilovani yuklab olish');
+  btn.innerHTML =
+    '<span class="pwa-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">' +
+    '<path d="M12 4v11"/><path d="M7 11l5 5 5-5"/><path d="M5 20h14"/></svg></span>' +
+    '<span class="pwa-tx"><span class="pwa-t1">Ilovani yuklab olish</span><span class="pwa-t2">Telefon va kompyuter uchun</span></span>' +
+    '<span class="pwa-x" role="button" aria-label="Yopish" title="Yopish">×</span>';
   document.body.appendChild(btn);
 
-  function show() { btn.style.display = 'flex'; }
+  var dismissed = false;
+  function show() { if (!dismissed) btn.style.display = 'flex'; }
   function hide() { btn.style.display = 'none'; }
 
   function showHelp(html) {
     var w = document.createElement('div');
-    w.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000002;display:flex;align-items:center;justify-content:center;padding:20px;';
-    w.innerHTML = '<div style="background:#0d1117;color:#e5e7eb;border:1px solid rgba(255,255,255,.1);max-width:360px;width:100%;border-radius:16px;padding:20px;font:15px/1.6 \'Geist\',system-ui,sans-serif;">' +
-      html + '<button type="button" style="margin-top:14px;width:100%;padding:10px;border:none;border-radius:10px;background:#2563eb;color:#fff;font-weight:600;cursor:pointer">Tushunarli</button></div>';
-    w.addEventListener('click', function (e) { if (e.target === w || e.target.tagName === 'BUTTON') w.remove(); });
+    w.className = 'pwa-modal';
+    w.innerHTML = '<div class="pwa-card">' + html + '<button type="button" class="pwa-ok">Tushunarli</button></div>';
+    w.addEventListener('click', function (e) {
+      if (e.target === w || (e.target.classList && e.target.classList.contains('pwa-ok'))) w.remove();
+    });
     document.body.appendChild(w);
   }
 
@@ -7500,14 +7590,34 @@
   });
   window.addEventListener('appinstalled', function () { deferredPrompt = null; hide(); });
 
-  btn.addEventListener('click', function () {
+  btn.addEventListener('click', function (e) {
+    // × bosilsa: faqat yopamiz
+    if (e.target.closest && e.target.closest('.pwa-x')) {
+      e.stopPropagation();
+      dismissed = true; hide();
+      return;
+    }
+
+    // ovoz + animatsiya
+    playChulp();
+    var r = btn.getBoundingClientRect();
+    var rip = document.createElement('span');
+    rip.className = 'pwa-rip';
+    rip.style.left = (e.clientX - r.left) + 'px';
+    rip.style.top = (e.clientY - r.top) + 'px';
+    btn.appendChild(rip);
+    setTimeout(function () { rip.remove(); }, 750);
+    btn.classList.remove('pwa-pop'); void btn.offsetWidth; btn.classList.add('pwa-pop');
+    setTimeout(function () { btn.classList.remove('pwa-pop'); }, 600);
+    if (navigator.vibrate) navigator.vibrate(12);
+
     if (deferredPrompt) {
       deferredPrompt.prompt();
       deferredPrompt.userChoice.then(function () { deferredPrompt = null; hide(); });
     } else if (isIOS) {
-      showHelp('<b>iPhone / iPad da o\'rnatish</b><br>1. Safari pastidagi <b>Ulashish</b> (⬆️) tugmasini bosing.<br>2. <b>«Bosh ekranga qo\'shish»</b> (Add to Home Screen) ni tanlang.<br>3. <b>Qo\'shish</b> ni bosing.');
+      showHelp('<div class="pwa-h">📲 iPhone / iPad ga o\'rnatish</div>1. Safari pastidagi <b>Ulashish</b> (⬆️) tugmasini bosing.<br>2. <b>«Bosh ekranga qo\'shish»</b> (Add to Home Screen) ni tanlang.<br>3. <b>Qo\'shish</b> ni bosing.');
     } else {
-      showHelp('<b>Ilovani o\'rnatish</b><br>Brauzer menyusini (⋮) oching va <b>«Ilovani o\'rnatish»</b> yoki <b>«Bosh ekranga qo\'shish»</b> (Install app / Add to Home screen) ni tanlang.');
+      showHelp('<div class="pwa-h">📲 Ilovani o\'rnatish</div>Brauzer menyusini (⋮) oching va <b>«Ilovani o\'rnatish»</b> yoki <b>«Bosh ekranga qo\'shish»</b> (Install app / Add to Home screen) ni tanlang.');
     }
   });
 
