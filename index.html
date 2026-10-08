@@ -31,6 +31,12 @@
         <title>Ferdinant Edu CRM</title>
 
         <link rel="icon" type="image/png" href="images/logo.png">
+        <!-- PWA: ilovani o'rnatish -->
+        <meta name="theme-color" content="#1e2327">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-title" content="Ferdinant CRM">
+        <link rel="apple-touch-icon" href="images/logo.png">
         <script src="auth-guard.js?v=2"></script>
     </head>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -7404,6 +7410,109 @@
     });
     items.forEach(function (it) { mo.observe(it, { attributes: true, attributeFilter: ["class"], attributeOldValue: true }); });
     g.addEventListener("animationend", function (e) { if (e.animationName === "fxGlide") g.classList.remove("go"); });
+})();
+</script>
+
+<!-- ===================== ILOVANI YUKLAB OLISH TUGMASI (PWA) ===================== -->
+<script>
+(function () {
+  var APP_NAME = 'Ferdinant Edu CRM';
+  var LOGO = 'images/logo.png';
+
+  // Allaqachon o'rnatilgan ilova ichida bo'lsak, hech narsa kerak emas
+  if (window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true) return;
+
+  var ua = navigator.userAgent;
+  var isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  var deferredPrompt = null;
+
+  // ---- 1) Manifest: logo.png'dan 192 va 512 ikonka yasab, manifestni kod ichida yaratamiz ----
+  function resize(img, size) {
+    var c = document.createElement('canvas');
+    c.width = c.height = size;
+    c.getContext('2d').drawImage(img, 0, 0, size, size);
+    return c.toDataURL('image/png');
+  }
+  function addManifest(icons) {
+    if (document.querySelector('link[rel="manifest"]')) return;
+    var base = location.origin + location.pathname.replace(/[^\/]*$/, '');
+    var m = {
+      id: base,
+      name: APP_NAME,
+      short_name: 'Ferdinant',
+      start_url: base,
+      scope: base,
+      display: 'standalone',
+      background_color: '#06080f',
+      theme_color: '#1e2327',
+      icons: icons
+    };
+    var l = document.createElement('link');
+    l.rel = 'manifest';
+    l.href = URL.createObjectURL(new Blob([JSON.stringify(m)], { type: 'application/manifest+json' }));
+    document.head.appendChild(l);
+  }
+  var img = new Image();
+  img.onload = function () {
+    try {
+      addManifest([
+        { src: resize(img, 192), sizes: '192x192', type: 'image/png', purpose: 'any' },
+        { src: resize(img, 512), sizes: '512x512', type: 'image/png', purpose: 'any' }
+      ]);
+    } catch (e) { console.warn('PWA manifest xato:', e); }
+  };
+  img.src = LOGO;
+
+  // ---- 2) Tugma ----
+  var st = document.createElement('style');
+  st.textContent =
+    '#pwa-install-btn{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:1000001;' +
+    'display:none;align-items:center;gap:8px;padding:12px 18px;border:none;border-radius:999px;background:#2563eb;color:#fff;' +
+    'font:600 14px "Geist",system-ui,-apple-system,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.35);cursor:pointer}' +
+    '#pwa-install-btn:hover{background:#1d4ed8}' +
+    '@media (max-width:900px){#pwa-install-btn{bottom:calc(84px + env(safe-area-inset-bottom,0px))}}' +
+    '#auth-overlay ~ #pwa-install-btn{bottom:calc(16px + env(safe-area-inset-bottom,0px))}';
+  document.head.appendChild(st);
+
+  var btn = document.createElement('button');
+  btn.id = 'pwa-install-btn';
+  btn.type = 'button';
+  btn.innerHTML = '<span style="font-size:16px">📲</span><span>Ilovani yuklab olish</span>';
+  document.body.appendChild(btn);
+
+  function show() { btn.style.display = 'flex'; }
+  function hide() { btn.style.display = 'none'; }
+
+  function showHelp(html) {
+    var w = document.createElement('div');
+    w.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000002;display:flex;align-items:center;justify-content:center;padding:20px;';
+    w.innerHTML = '<div style="background:#0d1117;color:#e5e7eb;border:1px solid rgba(255,255,255,.1);max-width:360px;width:100%;border-radius:16px;padding:20px;font:15px/1.6 \'Geist\',system-ui,sans-serif;">' +
+      html + '<button type="button" style="margin-top:14px;width:100%;padding:10px;border:none;border-radius:10px;background:#2563eb;color:#fff;font-weight:600;cursor:pointer">Tushunarli</button></div>';
+    w.addEventListener('click', function (e) { if (e.target === w || e.target.tagName === 'BUTTON') w.remove(); });
+    document.body.appendChild(w);
+  }
+
+  // Android / Windows / Mac (Chrome, Edge): brauzer o'zi o'rnatadi
+  window.addEventListener('beforeinstallprompt', function (e) {
+    e.preventDefault();
+    deferredPrompt = e;
+    show();
+  });
+  window.addEventListener('appinstalled', function () { deferredPrompt = null; hide(); });
+
+  btn.addEventListener('click', function () {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(function () { deferredPrompt = null; hide(); });
+    } else if (isIOS) {
+      showHelp('<b>iPhone / iPad da o\'rnatish</b><br>1. Safari pastidagi <b>Ulashish</b> (⬆️) tugmasini bosing.<br>2. <b>«Bosh ekranga qo\'shish»</b> (Add to Home Screen) ni tanlang.<br>3. <b>Qo\'shish</b> ni bosing.');
+    } else {
+      showHelp('<b>Ilovani o\'rnatish</b><br>Brauzer menyusini (⋮) oching va <b>«Ilovani o\'rnatish»</b> yoki <b>«Bosh ekranga qo\'shish»</b> (Install app / Add to Home screen) ni tanlang.');
+    }
+  });
+
+  // iPhone'da avtomatik o'rnatish hodisasi yo'q, shuning uchun tugma doim ko'rinadi
+  if (isIOS) show();
 })();
 </script>
 </body>
