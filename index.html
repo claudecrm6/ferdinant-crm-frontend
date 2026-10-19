@@ -3535,6 +3535,20 @@
         </div>
     </div>
 
+    <!-- Testga kirish uchun to'lov ogohlantirishi -->
+    <div class="modal-backdrop" id="ts-pay-modal">
+        <div class="modal-box" style="max-width:440px;text-align:center">
+            <div style="font-size:44px;color:var(--amber);margin-bottom:10px"><i class="fas fa-triangle-exclamation"></i></div>
+            <div class="modal-title" style="justify-content:center">To'lov qilinmagan</div>
+            <p style="color:var(--text2);margin:6px 0 14px"><strong id="ts-pay-name" style="color:var(--text1)"></strong> hali to'lovni to'liq amalga oshirmagan. Testga kirish uchun avval to'lov qiling.</p>
+            <div id="ts-pay-info" style="font-family:var(--mono);padding:10px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:18px"></div>
+            <div style="display:flex;gap:10px;justify-content:center">
+                <button class="btn btn-ghost" onclick="tsCancelPay()">Bekor qilish</button>
+                <button class="btn btn-primary" onclick="tsPayNow()"><i class="fas fa-credit-card"></i> To'lov qilish</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Test natijasi uchun modal (faqat ism so'rash) -->
 
     <div class="modal fade" id="nameModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
@@ -5916,6 +5930,7 @@
                 closeModal("payment-modal");
                 await Promise.all([reloadStudents(), reloadPayments()]);
                 render();
+                tsAfterPayment(); // test sahifasidan to'lovga o'tilgan bo'lsa, testga qaytaradi
             } else toast("Xatolik yuz berdi!", "error");
         }
 
@@ -6524,7 +6539,7 @@
 
             const modalElement = document.getElementById('nameModal');
             nameModalInstance = new bootstrap.Modal(modalElement, { backdrop: 'static', keyboard: false });
-            document.getElementById("userNameInput").value = "";
+            document.getElementById("userNameInput").value = tsSelectedStudent()?.name || "";
             nameModalInstance.show();
         }
 
@@ -6657,6 +6672,7 @@
             if (!activeTest) return;
             const filterBar = document.querySelector(".tests-wrapper .filter-bar");
             if (filterBar) filterBar.style.display = "none";
+            tsSelected = null; // har safar yangi o'quvchi tanlanadi va to'lovi tekshiriladi
             renderTestQuizFlow();
             tsInit();
         }
@@ -6665,6 +6681,8 @@
         function backToTestsList() {
             testClearTimers();
             activeTest = null;
+            tsSelected = null;
+            tsPendingPay = null;
             renderTests();
         }
 
@@ -6696,25 +6714,27 @@
             return tsIndex.map;
         }
 
-        function tsAttachedIds() {
-            return Array.isArray(activeTest?.studentIds) ? activeTest.studentIds : [];
+        // Tanlangan (to'lovi tekshirilgan) o'quvchi id'si va to'lov qilish uchun kutilayotgan holat
+        let tsSelected = null;
+        let tsPendingPay = null; // { testId, studentId } — to'lovdan keyin testga qaytish uchun
+
+        // O'quvchi to'lov qilgan hisoblanadi, agar qarzi qolmagan bo'lsa.
+        // (Qisman to'lagan o'quvchi ham hali to'liq to'lamagan hisoblanadi.)
+        function tsIsPaid(st) {
+            return (Number(st.debt_amount) || 0) <= 0;
         }
 
-        // Faqat hozir bazada mavjud o'quvchilar (o'chirilganlari ko'rsatilmaydi)
-        function tsAttachedStudents() {
-            const byId = new Map(students.map(st => [st.id, st]));
-            return tsAttachedIds().map(id => byId.get(id)).filter(Boolean);
+        function tsSelectedStudent() {
+            return tsSelected == null ? null : (students.find(x => x.id === tsSelected) || null);
         }
 
         function tsSearch(query) {
             const q = tsNorm(query);
             if (!q) return [];
             const tokens = q.split(" ");
-            const attached = new Set(tsAttachedIds());
             const idx = tsGetIndex();
             const out = [];
             for (const st of students) {
-                if (attached.has(st.id)) continue; // takror biriktirilmaydi
                 const name = idx.get(st.id) || "";
                 const words = name.split(" ");
                 // har bir so'z ismning biror so'zi boshidan mos kelishi kerak
@@ -6730,16 +6750,23 @@
             return g ? g.name : "";
         }
 
+        // Tanlangan o'quvchini chip ko'rinishida ko'rsatadi
         function tsRenderChips() {
             const chips = document.getElementById("tsChips");
-            const count = document.getElementById("tsCount");
             if (!chips) return;
-            const list = tsAttachedStudents();
-            if (count) count.textContent = list.length ? list.length + " ta" : "";
-            chips.innerHTML = list.map(st => `
-                <span class="ts-chip">${escapeHtml(st.name)}
-                    <button type="button" title="Olib tashlash" aria-label="Olib tashlash" onclick="tsDetach(${st.id})"><i class="fas fa-xmark"></i></button>
-                </span>`).join("");
+            const st = tsSelectedStudent();
+            chips.innerHTML = st ? `
+                <span class="ts-chip"><i class="fas fa-circle-check" style="color:var(--green)"></i> ${escapeHtml(st.name)}
+                    <button type="button" title="Boshqa o'quvchi tanlash" aria-label="Boshqa o'quvchi tanlash" onclick="tsClear()"><i class="fas fa-xmark"></i></button>
+                </span>` : "";
+        }
+
+        function tsClear() {
+            tsSelected = null;
+            tsRenderChips();
+            testHideInfo();
+            const input = document.getElementById("tsInput");
+            if (input) input.focus();
         }
 
         function tsRenderList(query) {
@@ -6758,6 +6785,9 @@
                         <div class="student-avatar" style="background:${hashColor(st.name || "?")}22;color:${hashColor(st.name || "?")}">${escapeHtml(initials(st.name || "?"))}</div>
                         <span class="ts-item-name">${escapeHtml(st.name)}</span>
                         <span class="ts-item-group">${escapeHtml(tsGroupName(st))}</span>
+                        ${tsIsPaid(st)
+                        ? `<span style="color:var(--green);font-size:11px;white-space:nowrap"><i class="fas fa-check"></i> To'langan</span>`
+                        : `<span style="color:var(--red);font-size:11px;white-space:nowrap"><i class="fas fa-xmark"></i> To'lanmagan</span>`}
                     </div>`).join("");
             }
             box.classList.add("open");
@@ -6781,28 +6811,70 @@
             items[tsActive].scrollIntoView({ block: "nearest" });
         }
 
-        function tsAttach(id) {
+        // Ro'yxatdan o'quvchi tanlanganda: to'lagan bo'lsa testga yo'naltiriladi,
+        // to'lamagan bo'lsa ogohlantirish modali ("To'lov qilish" tugmasi bilan) chiqadi.
+        function tsSelect(id) {
             if (!activeTest) return;
-            // Faqat bazadagi mavjud o'quvchi
             const st = students.find(x => x.id === id);
             if (!st) { toast("O'quvchi bazada topilmadi", "error"); return; }
-            if (!Array.isArray(activeTest.studentIds)) activeTest.studentIds = [];
-            // Takroriy yozuvga yo'l qo'yilmaydi
-            if (activeTest.studentIds.includes(id)) { toast("Bu o'quvchi allaqachon biriktirilgan", "info"); return; }
-            activeTest.studentIds.push(id);
-            saveTests();
             const input = document.getElementById("tsInput");
-            if (input) { input.value = ""; input.focus(); }
+            if (input) input.value = "";
             tsCloseList();
+
+            if (!tsIsPaid(st)) {
+                tsSelected = null;
+                tsRenderChips();
+                tsShowUnpaid(st);
+                return;
+            }
+            tsSelected = st.id;
             tsRenderChips();
-            toast(`${escapeHtml(st.name)} testga biriktirildi`);
+            toast(`${escapeHtml(st.name)} — to'lov qilingan, testga o'tishingiz mumkin`);
+            testShowInfo(); // reglament paneliga yo'naltirish ("Boshlash" tugmasi shu yerda)
         }
 
-        function tsDetach(id) {
-            if (!activeTest || !Array.isArray(activeTest.studentIds)) return;
-            activeTest.studentIds = activeTest.studentIds.filter(x => x !== id);
-            saveTests();
-            tsRenderChips();
+        function tsShowUnpaid(st) {
+            tsPendingPay = { testId: activeTest.id, studentId: st.id };
+            const debt = Number(st.debt_amount) || 0;
+            const paid = Number(st.paid_amount) || 0;
+            document.getElementById("ts-pay-name").textContent = st.name;
+            document.getElementById("ts-pay-info").innerHTML = `
+                <div style="margin-bottom:6px"><span style="color:var(--text2)">To'langan:</span> <span style="color:var(--green)">${fmtFull(paid)} so'm</span></div>
+                <div><span style="color:var(--text2)">Qolgan qarz:</span> <span style="color:var(--red);font-weight:700">${fmtFull(debt)} so'm</span></div>`;
+            openModal("ts-pay-modal");
+        }
+
+        function tsPayNow() {
+            if (!tsPendingPay) return;
+            closeModal("ts-pay-modal");
+            openPayModal(tsPendingPay.studentId);
+        }
+
+        function tsCancelPay() {
+            tsPendingPay = null;
+            closeModal("ts-pay-modal");
+        }
+
+        // To'lov qabul qilingach (submitPayment ichidan chaqiriladi): agar to'lov shu
+        // test sahifasidan boshlangan bo'lsa, testni qayta ochib to'lovni qayta tekshiradi.
+        function tsAfterPayment() {
+            const p = tsPendingPay;
+            tsPendingPay = null;
+            if (!p || currentPage !== "tests") return;
+            if (!testsList.some(t => t.id === p.testId)) return;
+            openTestStart(p.testId);
+            tsSelect(p.studentId);
+        }
+
+        // Katta "test nomi" tugmasi: o'quvchi tanlanmagan bo'lsa testga o'tkazmaydi
+        function tsStartGuard() {
+            if (!tsSelectedStudent()) {
+                toast("Avval o'quvchini tanlang", "info");
+                const input = document.getElementById("tsInput");
+                if (input) input.focus();
+                return;
+            }
+            testShowInfo();
         }
 
         function tsInit() {
@@ -6817,7 +6889,7 @@
                 const open = box.classList.contains("open");
                 if (e.key === "ArrowDown") { e.preventDefault(); if (open) tsHighlight(tsActive + 1); else tsRenderList(input.value); }
                 else if (e.key === "ArrowUp") { e.preventDefault(); if (open) tsHighlight(tsActive - 1); }
-                else if (e.key === "Enter") { e.preventDefault(); if (open && tsResults[tsActive]) tsAttach(tsResults[tsActive].id); }
+                else if (e.key === "Enter") { e.preventDefault(); if (open && tsResults[tsActive]) tsSelect(tsResults[tsActive].id); }
                 else if (e.key === "Escape") { tsCloseList(); }
             });
             // Ro'yxatdan tanlanmagan matn qoldirilmaydi — faqat mavjud o'quvchi tanlanadi
@@ -6826,7 +6898,7 @@
             box.addEventListener("mousedown", e => {
                 e.preventDefault();
                 const item = e.target.closest(".ts-item");
-                if (item) tsAttach(Number(item.dataset.id));
+                if (item) tsSelect(Number(item.dataset.id));
             });
         }
 
@@ -7035,15 +7107,15 @@
     <div style="display:flex;justify-content:center">
         <div class="test-container" style="max-width:700px;width:100%">
             <div id="testStartPanel" style="display:flex;flex-direction:column;justify-content:center;align-items:center;gap:28px;min-height:50vh">
-                <button class="btn btn-primary" style="padding:18px 48px;font-size:1.2rem" onclick="testShowInfo()"><i class="fas fa-microchip"></i> ${activeTest.name}</button>
+                <button class="btn btn-primary" style="padding:18px 48px;font-size:1.2rem" onclick="tsStartGuard()"><i class="fas fa-microchip"></i> ${activeTest.name}</button>
                 <div class="ts-card">
-                    <div class="ts-title"><i class="fas fa-user-plus" style="color:#38BDF8"></i> O'quvchilarni biriktirish <small id="tsCount"></small></div>
+                    <div class="ts-title"><i class="fas fa-user-graduate" style="color:#38BDF8"></i> O'quvchini tanlang</div>
                     <div class="ts-combo">
                         <input id="tsInput" type="text" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="tsList" placeholder="🔍 O'quvchi ism yoki familiyasini yozing...">
                         <div id="tsList" class="ts-list" role="listbox"></div>
                     </div>
                     <div id="tsChips" class="ts-chips"></div>
-                    <div class="ts-hint">Faqat bazadagi o'quvchilarni tanlash mumkin.</div>
+                    <div class="ts-hint">Faqat to'lov qilgan o'quvchi testga kira oladi.</div>
                 </div>
             </div>
             <div id="testInfoPanel" style="display:none">
