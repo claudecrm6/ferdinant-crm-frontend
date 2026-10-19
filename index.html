@@ -3830,7 +3830,7 @@
                     ? Math.max(...payments.map(p => p.id)) + 1
                     : 1;
 
-                await checkNewMonthDebts();
+                // Oylik reset endi faqat backendda (ensure_monthly_reset) bajariladi.
 
                 updateTopbarStat();
                 render();
