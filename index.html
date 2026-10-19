@@ -3539,12 +3539,12 @@
     <div class="modal-backdrop" id="ts-pay-modal">
         <div class="modal-box" style="max-width:440px;text-align:center">
             <div style="font-size:44px;color:var(--amber);margin-bottom:10px"><i class="fas fa-triangle-exclamation"></i></div>
-            <div class="modal-title" style="justify-content:center">To'lov qilinmagan</div>
-            <p style="color:var(--text2);margin:6px 0 14px"><strong id="ts-pay-name" style="color:var(--text1)"></strong> hali to'lovni to'liq amalga oshirmagan. Testga kirish uchun avval to'lov qiling.</p>
+            <div class="modal-title" style="justify-content:center" id="ts-pay-title">To'lov qilinmagan</div>
+            <p style="color:var(--text2);margin:6px 0 14px"><strong id="ts-pay-name" style="color:var(--text1)"></strong><br><span id="ts-pay-reason"></span></p>
             <div id="ts-pay-info" style="font-family:var(--mono);padding:10px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:18px"></div>
             <div style="display:flex;gap:10px;justify-content:center">
                 <button class="btn btn-ghost" onclick="tsCancelPay()">Bekor qilish</button>
-                <button class="btn btn-primary" onclick="tsPayNow()"><i class="fas fa-credit-card"></i> To'lov qilish</button>
+                <button class="btn btn-primary" id="ts-pay-btn" onclick="tsPayNow()"><i class="fas fa-credit-card"></i> To'lov qilish</button>
             </div>
         </div>
     </div>
@@ -6508,10 +6508,14 @@
                 const res = await fetch(`${API_URL}/telegram/send-quiz-result/`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ test_name: testName, name, score, total })
+                    body: JSON.stringify({ test_name: testName, name, score, total, access_token: tsAccessToken })
                 });
-                const data = await res.json();
+                const data = await res.json().catch(() => ({}));
                 console.log("Telegram (backend orqali):", data);
+                if (!res.ok) {
+                    // Backend to'lov/ruxsat tekshiruvidan o'tmagan so'rovni rad etdi
+                    return [{ ok: false, description: data.error || data.message || "Natijani yuborib bo'lmadi" }];
+                }
                 return [data];
             } catch (e) {
                 console.error("Telegram xatolik:", e);
@@ -6555,7 +6559,20 @@
             if (nextBtn) nextBtn.classList.remove("active-next");
         }
 
-        function testResetAndStart() {
+        async function testResetAndStart() {
+            // Test boshlanishidan oldin to'lov holati backendda yana tekshiriladi
+            const st = tsSelectedStudent();
+            if (!st) { testHideInfo(); toast("Avval o'quvchini tanlang", "info"); return; }
+            const access = await tsCheckAccess(st.id);
+            if (!access.allowed) {
+                tsSelected = null;
+                tsAccessToken = null;
+                tsRenderChips();
+                testHideInfo();
+                tsShowUnpaid(st, access);
+                return;
+            }
+            tsAccessToken = access.access_token;
             testClearTimers();
             testWrongCount = 0;
             testInitQuiz();
@@ -6673,6 +6690,7 @@
             const filterBar = document.querySelector(".tests-wrapper .filter-bar");
             if (filterBar) filterBar.style.display = "none";
             tsSelected = null; // har safar yangi o'quvchi tanlanadi va to'lovi tekshiriladi
+            tsAccessToken = null;
             renderTestQuizFlow();
             tsInit();
         }
@@ -6682,6 +6700,7 @@
             testClearTimers();
             activeTest = null;
             tsSelected = null;
+            tsAccessToken = null;
             tsPendingPay = null;
             renderTests();
         }
@@ -6717,6 +6736,7 @@
         // Tanlangan (to'lovi tekshirilgan) o'quvchi id'si va to'lov qilish uchun kutilayotgan holat
         let tsSelected = null;
         let tsPendingPay = null; // { testId, studentId } — to'lovdan keyin testga qaytish uchun
+        let tsAccessToken = null; // backend bergan imzolangan ruxsat tokeni (natija yuborishda kerak)
 
         // O'quvchi to'lov qilgan hisoblanadi, agar qarzi qolmagan bo'lsa.
         // (Qisman to'lagan o'quvchi ham hali to'liq to'lamagan hisoblanadi.)
@@ -6763,6 +6783,7 @@
 
         function tsClear() {
             tsSelected = null;
+            tsAccessToken = null;
             tsRenderChips();
             testHideInfo();
             const input = document.getElementById("tsInput");
@@ -6813,7 +6834,30 @@
 
         // Ro'yxatdan o'quvchi tanlanganda: to'lagan bo'lsa testga yo'naltiriladi,
         // to'lamagan bo'lsa ogohlantirish modali ("To'lov qilish" tugmasi bilan) chiqadi.
-        function tsSelect(id) {
+        // To'lov tekshiruvi BACKENDDA bajariladi (frontend faqat natijani ko'rsatadi).
+        async function tsCheckAccess(studentId) {
+            try {
+                const r = await fetch(`${API_URL}/tests/check-access/`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ student_id: studentId, test_type: (activeTest && activeTest.type) || "" })
+                });
+                const data = await r.json().catch(() => ({}));
+                if (r.ok && data.allowed && data.access_token) return data;
+                return {
+                    allowed: false,
+                    code: data.code || "error",
+                    message: data.message || data.error || "Tekshiruvni bajarib bo'lmadi. Qaytadan urinib ko'ring.",
+                    details: data.details || null
+                };
+            } catch (e) {
+                return { allowed: false, code: "network", message: "Server bilan aloqa yo'q. Internetni tekshirib, qaytadan urinib ko'ring.", details: null };
+            }
+        }
+
+        // Ro'yxatdan o'quvchi tanlanganda: backend to'lovni tekshiradi. Ruxsat bo'lsa
+        // reglament paneliga o'tiladi, aks holda sababi bilan ogohlantirish chiqadi.
+        async function tsSelect(id) {
             if (!activeTest) return;
             const st = students.find(x => x.id === id);
             if (!st) { toast("O'quvchi bazada topilmadi", "error"); return; }
@@ -6821,26 +6865,45 @@
             if (input) input.value = "";
             tsCloseList();
 
-            if (!tsIsPaid(st)) {
-                tsSelected = null;
-                tsRenderChips();
-                tsShowUnpaid(st);
+            tsSelected = null;
+            tsAccessToken = null;
+            tsRenderChips();
+            const testId = activeTest.id;
+            const access = await tsCheckAccess(st.id);
+            if (!activeTest || activeTest.id !== testId) return; // tekshiruv paytida sahifadan chiqib ketilgan
+
+            if (!access.allowed) {
+                tsShowUnpaid(st, access);
                 return;
             }
             tsSelected = st.id;
+            tsAccessToken = access.access_token;
             tsRenderChips();
-            toast(`${escapeHtml(st.name)} — to'lov qilingan, testga o'tishingiz mumkin`);
+            toast(`${escapeHtml(st.name)} — to'lov tasdiqlandi, testga o'tishingiz mumkin`);
             testShowInfo(); // reglament paneliga yo'naltirish ("Boshlash" tugmasi shu yerda)
         }
 
-        function tsShowUnpaid(st) {
+        function tsShowUnpaid(st, access) {
             tsPendingPay = { testId: activeTest.id, studentId: st.id };
-            const debt = Number(st.debt_amount) || 0;
-            const paid = Number(st.paid_amount) || 0;
+            const d = (access && access.details) || null;
+            const paid = d ? Number(d.paid_amount) || 0 : Number(st.paid_amount) || 0;
+            const debt = d ? Number(d.debt_amount) || 0 : Number(st.debt_amount) || 0;
+            const code = (access && access.code) || "";
+            const payRelated = ["debt_remaining", "second_payment_required", "second_payment_incomplete", "payment_records_mismatch"].includes(code);
+            const titles = {
+                second_payment_required: "Ikkinchi to'lov kerak",
+                second_payment_incomplete: "Ikkinchi to'lov to'liq emas",
+                payment_records_mismatch: "To'lov ma'lumotlari mos emas"
+            };
+            document.getElementById("ts-pay-title").textContent = payRelated ? (titles[code] || "To'lov qilinmagan") : "Testga kirish mumkin emas";
             document.getElementById("ts-pay-name").textContent = st.name;
-            document.getElementById("ts-pay-info").innerHTML = `
+            document.getElementById("ts-pay-reason").textContent = (access && access.message) || "Testga kirish uchun to'lov talab qilinadi.";
+            document.getElementById("ts-pay-info").innerHTML = payRelated ? `
                 <div style="margin-bottom:6px"><span style="color:var(--text2)">To'langan:</span> <span style="color:var(--green)">${fmtFull(paid)} so'm</span></div>
-                <div><span style="color:var(--text2)">Qolgan qarz:</span> <span style="color:var(--red);font-weight:700">${fmtFull(debt)} so'm</span></div>`;
+                <div><span style="color:var(--text2)">Qolgan qarz:</span> <span style="color:${debt > 0 ? "var(--red)" : "var(--green)"};font-weight:700">${fmtFull(debt)} so'm</span></div>` : "";
+            document.getElementById("ts-pay-info").style.display = payRelated ? "block" : "none";
+            const payBtn = document.getElementById("ts-pay-btn");
+            if (payBtn) payBtn.style.display = (payRelated && code !== "payment_records_mismatch") ? "" : "none";
             openModal("ts-pay-modal");
         }
 
@@ -7115,7 +7178,7 @@
                         <div id="tsList" class="ts-list" role="listbox"></div>
                     </div>
                     <div id="tsChips" class="ts-chips"></div>
-                    <div class="ts-hint">Faqat to'lov qilgan o'quvchi testga kira oladi.</div>
+                    <div class="ts-hint">To'lov holati serverda tekshiriladi: oraliq testga barcha to'lovlari yopilgan, yakuniy testga ikkinchi to'lovi ham to'liq amalga oshirilgan o'quvchi kira oladi.</div>
                 </div>
             </div>
             <div id="testInfoPanel" style="display:none">
