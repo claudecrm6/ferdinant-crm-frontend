@@ -3166,6 +3166,60 @@
             .dx-chart { height: 220px }
             .dx-spark { height: 52px }
         }
+
+        /* ===================== OYLIK (O'QITUVCHI OYLIGI) ===================== */
+        .ok-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; justify-content: space-between; margin-bottom: 18px }
+        .ok-title { font-size: 13px; color: var(--text2); display: flex; align-items: center; gap: 8px }
+        .ok-title b { color: var(--text1); font-size: 15px; letter-spacing: -.01em }
+        .ok-picker { display: flex; align-items: center; gap: 8px; flex-wrap: wrap }
+        .ok-picker select { width: auto; min-width: 118px; padding: 9px 12px }
+        .ok-nav { width: 38px; height: 38px; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; border: 1px solid var(--border2); background: var(--card); color: var(--text1); cursor: pointer; transition: background .2s, transform .15s }
+        .ok-nav:hover { background: rgba(255, 255, 255, .06) }
+        .ok-nav:active { transform: scale(.94) }
+        .ok-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 26px }
+        .ok-stat { position: relative; overflow: hidden; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; display: flex; flex-direction: column; gap: 14px; transition: border-color .2s, transform .2s }
+        .ok-stat::before { content: ''; position: absolute; inset: 0 0 auto 0; height: 3px; background: var(--ok-c, var(--accent)); opacity: .9 }
+        .ok-stat::after { content: ''; position: absolute; right: -36px; top: -36px; width: 120px; height: 120px; border-radius: 50%; background: var(--ok-c, var(--accent)); opacity: .07 }
+        .ok-stat:hover { border-color: var(--border2); transform: translateY(-2px) }
+        .ok-stat .ok-ico { width: 40px; height: 40px; border-radius: 11px; display: flex; align-items: center; justify-content: center; font-size: 17px; color: var(--ok-c, var(--accent)); background: color-mix(in srgb, var(--ok-c, var(--accent)) 14%, transparent) }
+        .ok-stat .ok-val { font-family: var(--mono); font-weight: 700; font-size: clamp(20px, 2.2vw, 27px); line-height: 1.1; color: var(--text1); word-break: break-word }
+        .ok-stat .ok-val small { font-size: .55em; font-weight: 600; color: var(--text2); margin-left: 4px }
+        .ok-stat .ok-lbl { font-size: 12.5px; color: var(--text2) }
+        .ok-stat .ok-sub { font-size: 11.5px; color: var(--text3); margin-top: -8px }
+        .ok-stat.c-blue { --ok-c: #3b82f6 } .ok-stat.c-purple { --ok-c: #8b5cf6 } .ok-stat.c-amber { --ok-c: #f59e0b } .ok-stat.c-green { --ok-c: #10b981 }
+        .ok-sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin: 0 0 14px }
+        .ok-sec-head h3 { font-size: 15px; font-weight: 600; letter-spacing: -.01em }
+        .ok-sec-head span { font-size: 12.5px; color: var(--text3) }
+        .ok-courses { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 14px }
+        .ok-course { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; transition: border-color .2s, transform .2s; min-width: 0 }
+        .ok-course:hover { border-color: var(--border2); transform: translateY(-2px) }
+        .ok-course.ok-empty { opacity: .72 }
+        .ok-course-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px }
+        .ok-course-name { font-weight: 700; font-size: 15px; line-height: 1.3; overflow-wrap: anywhere }
+        .ok-badge { flex-shrink: 0; font-family: var(--mono); font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; color: #a5b4fc; background: rgba(99, 102, 241, .14); border: 1px solid rgba(99, 102, 241, .28) }
+        .ok-net { display: flex; flex-direction: column; gap: 2px }
+        .ok-net .ok-net-lbl { font-size: 11.5px; color: var(--text2); text-transform: uppercase; letter-spacing: .06em }
+        .ok-net .ok-net-val { font-family: var(--mono); font-size: 24px; font-weight: 700; color: var(--green) }
+        .ok-net .ok-net-val small { font-size: 12px; color: var(--text2); font-weight: 600 }
+        .ok-bar { height: 7px; border-radius: 999px; background: rgba(255, 255, 255, .07); overflow: hidden; display: flex }
+        .ok-bar i { display: block; height: 100%; background: linear-gradient(90deg, #10b981, #34d399); transition: width .5s var(--ease, ease) }
+        .ok-rows { display: flex; flex-direction: column; gap: 9px; font-size: 13px }
+        .ok-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px }
+        .ok-row span:first-child { color: var(--text2) }
+        .ok-row b { font-family: var(--mono); font-weight: 600; white-space: nowrap }
+        .ok-row b.amber { color: #fbbf24 }
+        .ok-note { margin-top: 16px; font-size: 12.5px; color: var(--text3); display: flex; gap: 8px; align-items: flex-start }
+        .ok-empty-state { text-align: center; color: var(--text2); padding: 40px 16px; border: 1px dashed var(--border2); border-radius: var(--radius-lg) }
+        .ok-empty-state i { font-size: 28px; margin-bottom: 10px; color: var(--text3) }
+        @media (max-width: 600px) {
+            .ok-toolbar { flex-direction: column; align-items: stretch }
+            .ok-picker { justify-content: space-between }
+            .ok-picker select { flex: 1; min-width: 0 }
+            .ok-summary { grid-template-columns: 1fr 1fr; gap: 10px }
+            .ok-stat { padding: 16px }
+        }
+        @media (max-width: 400px) { .ok-summary { grid-template-columns: 1fr } }
+        @media (prefers-reduced-motion: reduce) { .ok-stat, .ok-course, .ok-bar i { transition: none !important } }
     </style>
 </head>
 
@@ -3196,6 +3250,7 @@
             <div class="nav-label">Moliya</div>
             <div class="nav-item" data-page="payments" title="To'lovlar"><i class="fas fa-credit-card"></i><span class="nav-txt">To'lovlar</span></div>
             <div class="nav-item" data-page="debtors" title="Qarzdorlar"><i class="fas fa-user-slash"></i><span class="nav-txt">Qarzdorlar</span></div>
+            <div class="nav-item" data-page="oylik" title="Oylik"><i class="fas fa-wallet"></i><span class="nav-txt">Oylik</span></div>
 
             <div class="nav-label">Qo'shimcha</div>
             <div class="nav-item" data-page="tests" title="Testlar"><i class="fas fa-flask"></i><span class="nav-txt">Testlar</span></div>
@@ -3327,6 +3382,10 @@
             <div class="form-group"><label>Egasi (Foydalanuvchi)</label><select id="m-courseuser"></select></div>
             <div class="form-group"><label>To'lov summasi (so'm)</label><input id="m-courseprice" type="text"
                     class="money-input">
+            </div>
+            <div class="form-group"><label>O'qituvchi ulushi (%)</label><input id="m-coursepercent" type="number"
+                    min="0" max="100" step="0.01" inputmode="decimal" placeholder="0 – 100">
+                <small style="color:var(--text3);font-size:11.5px">Oylik = kurs tushumi × foiz / 100. 0 dan 100 gacha.</small>
             </div>
             <div class="modal-actions">
                 <button class="btn btn-ghost" onclick="closeModal('course-modal')">Bekor</button>
@@ -4008,6 +4067,7 @@
             students: "O'quvchilar",
             payments: "To'lovlar",
             debtors: "Qarzdorlar",
+            oylik: "Oylik",
             trash: "O'chirilganlar",
             tests: "Testlar",
             certificates: "Sertifikatlar",
@@ -4110,11 +4170,145 @@
             else if (currentPage === "students") renderStudents();
             else if (currentPage === "payments") renderPayments();
             else if (currentPage === "debtors") renderDebtors();
+            else if (currentPage === "oylik") renderOylik();
             else if (currentPage === "trash") renderTrash();
             else if (currentPage === "tests") renderTests();
             else if (currentPage === "certificates") renderCertificates();
             else if (currentPage === "profile") renderProfilePage();
             else renderPlaceholder();
+        }
+
+        // ===================== OYLIK (O'QITUVCHI OYLIGI) =====================
+        let oylikMonthIdx = new Date().getMonth();
+        let oylikYear = new Date().getFullYear();
+
+        // Tanlangan oy uchun hisob-kitob (toza funksiya — faqat global ma'lumotlarni o'qiydi).
+        // - Tushum: HAQIQATDA qilingan to'lovlar (p.date bo'yicha, Dashboard bilan bir xil qoida).
+        // - Har bir to'lov id bo'yicha faqat BIR marta hisoblanadi (takror sanalmaydi).
+        // - To'lov kursga: o'quvchi -> guruh -> guruhning course_type -> kurs orqali bog'lanadi.
+        // - Oylik = tushum × foiz / 100, butun so'mga yaxlitlanadi; qolgan = tushum − oylik.
+        //   Foiz 2 xonagacha saqlanadi, shuning uchun hisob butun sonlarda (foiz × 100) bajariladi.
+        function oylikCalc(month, year) {
+            const studentById = new Map(students.map(s => [s.id, s]));
+            const groupById = new Map(groups.map(g => [g.id, g]));
+            const courseFor = p => {
+                const st = studentById.get(p.student);
+                const g = st ? groupById.get(st.group) : null;
+                if (!g) return null;
+                const same = courses.filter(c => c.name === g.course_type);
+                return same.find(c => c.user === g.user) || same[0] || null;
+            };
+            const revenueByCourse = new Map();
+            const seen = new Set();
+            let unassigned = 0, total = 0, count = 0;
+            for (const p of payments) {
+                if (seen.has(p.id)) continue;
+                seen.add(p.id);
+                if (paidMonthUz(p) !== month || paidYear(p) !== year) continue;
+                const amount = Math.round(Number(p.amount) || 0);
+                if (!amount) continue;
+                total += amount; count++;
+                const c = courseFor(p);
+                if (c) revenueByCourse.set(c.id, (revenueByCourse.get(c.id) || 0) + amount);
+                else unassigned += amount;
+            }
+            const rows = courses.map(c => {
+                const revenue = revenueByCourse.get(c.id) || 0;
+                const raw = Number(c.teacher_percent);
+                const percent = Number.isFinite(raw) ? Math.min(100, Math.max(0, raw)) : 0;
+                const salary = Math.round(revenue * Math.round(percent * 100) / 10000);
+                return { id: c.id, name: c.name, revenue, percent, salary, remaining: revenue - salary };
+            }).sort((a, b) => b.revenue - a.revenue || a.name.localeCompare(b.name));
+            const salary = rows.reduce((s, r) => s + r.salary, 0);
+            const remaining = total - salary; // biriktirilmagan tushum ham "qolgan"ga kiradi
+            return {
+                rows, unassigned, total, count, salary, remaining,
+                effectivePercent: total > 0 ? (salary / total) * 100 : 0
+            };
+        }
+
+        function oylikSet(monthIdx, year) {
+            oylikMonthIdx = Math.min(11, Math.max(0, parseInt(monthIdx)));
+            oylikYear = parseInt(year) || curYear();
+            renderOylik();
+        }
+        function oylikShift(delta) {
+            let m = oylikMonthIdx + delta, y = oylikYear;
+            if (m < 0) { m = 11; y--; } else if (m > 11) { m = 0; y++; }
+            oylikSet(m, y);
+        }
+
+        function renderOylik() {
+            const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+            const so = n => `${fmtFull(n)}<small>so'm</small>`;
+            const pctTxt = n => `${(Math.round(n * 100) / 100).toLocaleString("en-US", { maximumFractionDigits: 2 })}%`;
+            const month = MONTHS_UZ[oylikMonthIdx];
+            const d = oylikCalc(month, oylikYear);
+
+            const years = new Set([curYear(), oylikYear]);
+            payments.forEach(p => { const y = paidYear(p); if (Number.isFinite(y)) years.add(y); });
+            const yearOpts = [...years].sort((a, b) => b - a)
+                .map(y => `<option value="${y}" ${y === oylikYear ? "selected" : ""}>${y}</option>`).join("");
+            const monthOpts = MONTHS_UZ.map((m, i) => `<option value="${i}" ${i === oylikMonthIdx ? "selected" : ""}>${m}</option>`).join("");
+            const isCurrent = oylikMonthIdx === now().getMonth() && oylikYear === curYear();
+
+            const stat = (cls, icon, val, lbl, sub = "") => `
+                <div class="ok-stat ${cls} anim-in">
+                    <div class="ok-ico"><i class="fas ${icon}"></i></div>
+                    <div class="ok-val">${val}</div>
+                    <div class="ok-lbl">${lbl}</div>
+                    ${sub ? `<div class="ok-sub">${sub}</div>` : ""}
+                </div>`;
+
+            const courseCard = r => `
+                <div class="ok-course anim-in ${r.revenue === 0 ? "ok-empty" : ""}">
+                    <div class="ok-course-head">
+                        <div class="ok-course-name">${esc(r.name)}</div>
+                        <span class="ok-badge" title="O'qituvchi foizi">${pctTxt(r.percent)}</span>
+                    </div>
+                    <div class="ok-net">
+                        <span class="ok-net-lbl">O'qituvchi oyligi</span>
+                        <span class="ok-net-val">${fmtFull(r.salary)} <small>so'm</small></span>
+                    </div>
+                    <div class="ok-bar" title="Tushumdagi o'qituvchi ulushi"><i style="width:${Math.min(100, r.percent)}%"></i></div>
+                    <div class="ok-rows">
+                        <div class="ok-row"><span>Oylik tushum</span><b>${fmtFull(r.revenue)} so'm</b></div>
+                        <div class="ok-row"><span>O'qituvchi foizi</span><b>${pctTxt(r.percent)}</b></div>
+                        <div class="ok-row"><span>Ushlab qolingan</span><b class="amber">${fmtFull(r.remaining)} so'm</b></div>
+                        <div class="ok-row"><span>O'qituvchi oyligi</span><b style="color:var(--green)">${fmtFull(r.salary)} so'm</b></div>
+                    </div>
+                </div>`;
+
+            const unassignedCard = d.unassigned > 0 ? courseCard({
+                name: "Kursga biriktirilmagan", revenue: d.unassigned, percent: 0, salary: 0, remaining: d.unassigned
+            }) : "";
+
+            document.getElementById("content").innerHTML = `
+                <div class="ok-toolbar">
+                    <div class="ok-title"><i class="fas fa-wallet"></i> <span><b>${month} ${oylikYear}</b> &middot; ${d.count} ta to'lov</span></div>
+                    <div class="ok-picker">
+                        <button class="ok-nav" onclick="oylikShift(-1)" title="Oldingi oy" aria-label="Oldingi oy"><i class="fas fa-chevron-left"></i></button>
+                        <select id="ok-month" onchange="oylikSet(this.value, document.getElementById('ok-year').value)" aria-label="Oy">${monthOpts}</select>
+                        <select id="ok-year" onchange="oylikSet(document.getElementById('ok-month').value, this.value)" aria-label="Yil">${yearOpts}</select>
+                        <button class="ok-nav" onclick="oylikShift(1)" title="Keyingi oy" aria-label="Keyingi oy"><i class="fas fa-chevron-right"></i></button>
+                        ${isCurrent ? "" : `<button class="btn btn-ghost btn-sm" onclick="oylikSet(${now().getMonth()}, ${curYear()})">Joriy oy</button>`}
+                    </div>
+                </div>
+
+                <div class="ok-summary">
+                    ${stat("c-blue", "fa-sack-dollar", so(d.total), "Umumiy oylik tushum", `${d.count} ta to'lov`)}
+                    ${stat("c-purple", "fa-percent", pctTxt(d.effectivePercent), "O'qituvchi ulushi", "Umumiy tushumdan")}
+                    ${stat("c-amber", "fa-scissors", so(d.remaining), "Ushlab qolingan summa", "Tushum − o'qituvchi oyligi")}
+                    ${stat("c-green", "fa-hand-holding-dollar", so(d.salary), "O'qituvchi oyligi", "Tushum × foiz / 100")}
+                </div>
+
+                <div class="ok-sec-head"><h3>Kurslar bo'yicha</h3><span>${d.rows.length} ta kurs</span></div>
+                ${d.rows.length === 0 && !unassignedCard
+                    ? `<div class="ok-empty-state"><i class="fas fa-graduation-cap"></i><p>Hali kurs qo'shilmagan. Avval Kurslar bo'limida kurs va o'qituvchi foizini kiriting.</p></div>`
+                    : `<div class="ok-courses">${d.rows.map(courseCard).join("")}${unassignedCard}</div>`}
+                ${d.count === 0 ? `<div class="ok-note"><i class="fas fa-circle-info"></i><span>${month} ${oylikYear} uchun to'lovlar topilmadi.</span></div>` : ""}
+                ${d.rows.some(r => r.percent === 0) && d.rows.length ? `<div class="ok-note"><i class="fas fa-circle-info"></i><span>Foizi 0% bo'lgan kurslar uchun o'qituvchi oyligi 0 hisoblanadi. Foizni Kurslar bo'limida kursni tahrirlab kiriting.</span></div>` : ""}
+            `;
         }
 
         // ===================== DASHBOARD =====================
@@ -4403,7 +4597,7 @@
         // ---------- Command palette (Ctrl/⌘ + K) ----------
         const CMDK_ICONS = {
             dashboard: "fa-chart-line", groups: "fa-layer-group", courses: "fa-graduation-cap",
-            students: "fa-user-graduate", payments: "fa-credit-card", debtors: "fa-user-slash",
+            students: "fa-user-graduate", payments: "fa-credit-card", debtors: "fa-user-slash", oylik: "fa-wallet",
             trash: "fa-trash-alt", tests: "fa-flask", certificates: "fa-certificate", profile: "fa-user-circle"
         };
         let cmdkItems = [], cmdkSel = 0;
@@ -4596,6 +4790,7 @@
                         </div>
                         <div class="group-card-body">
                             <div class="group-meta"><i class="fas fa-money-bill-wave"></i>${fmtFull(c.price)} so'm</div>
+                            <div class="group-meta"><i class="fas fa-percent"></i>O'qituvchi ulushi: ${Number(c.teacher_percent || 0)}%</div>
                         </div>
                     </div>`;
             }).join("")}</div>
@@ -4635,6 +4830,7 @@
             document.getElementById("course-modal-title").textContent = c ? "Kursni tahrirlash" : "Yangi kurs";
             document.getElementById("m-coursename").value = c?.name || "";
             setMoneyVal("m-courseprice", c?.price || 500000);
+            document.getElementById("m-coursepercent").value = c && c.teacher_percent != null ? c.teacher_percent : "";
             populateUserSelect("m-courseuser", c?.user ?? null);
             openModal("course-modal");
         }
@@ -4648,9 +4844,20 @@
 
             const ownerId = parseInt(document.getElementById("m-courseuser").value) || null;
 
+            // O'qituvchi foizi: bo'sh = 0; aks holda 0–100 oralig'idagi son (2 xonagacha)
+            const pctEl = document.getElementById("m-coursepercent");
+            const pctRaw = pctEl.value.trim().replace(",", ".");
+            const pctNum = pctRaw === "" ? 0 : Number(pctRaw);
+            // badInput: brauzer yaroqsiz matnni (masalan "1e") bo'sh qiymat sifatida ko'rsatadi —
+            // jimgina 0 saqlab yubormaslik uchun alohida tekshiriladi.
+            if ((pctEl.validity && pctEl.validity.badInput) || !Number.isFinite(pctNum) || pctNum < 0 || pctNum > 100) {
+                return toast("O'qituvchi foizi 0 dan 100 gacha bo'lishi kerak!", "error");
+            }
+
             const data = {
                 name,
                 price: getMoneyVal("m-courseprice"),
+                teacher_percent: Math.round(pctNum * 100) / 100,
                 user: ownerId
             };
 
@@ -4673,6 +4880,7 @@
                     toast(`"${name}" kursi tahrirlandi`);
                 } else {
                     toast("Kursni tahrirlashda xatolik!", "error");
+                    return; // modal ochiq qoladi, kiritilgan ma'lumot yo'qolmaydi
                 }
 
             } else {
@@ -4690,6 +4898,7 @@
                     toast(`"${name}" kursi qo'shildi`);
                 } else {
                     toast("Kurs qo'shishda xatolik!", "error");
+                    return;
                 }
             }
 
