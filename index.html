@@ -3334,7 +3334,8 @@
             <div class="cmdk-input">
                 <i class="fas fa-magnifying-glass"></i>
                 <input id="cmdkInput" placeholder="Qayerga o'tamiz?" autocomplete="off" spellcheck="false">
-                <kbd>Esc</kbd>
+                <kbd role="button" tabindex="0" aria-label="Yopish" title="Yopish" style="cursor:pointer"
+                    onclick="closeCmdk()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();closeCmdk()}">Esc</kbd>
             </div>
             <div class="cmdk-list" id="cmdkList"></div>
             <div class="cmdk-foot"><span><kbd>↑</kbd><kbd>↓</kbd> tanlash</span><span><kbd>↵</kbd> ochish</span></div>
@@ -3610,7 +3611,7 @@
 
     <!-- Test natijasi uchun modal (faqat ism so'rash) -->
 
-    <div class="modal fade" id="nameModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    <div class="modal fade" id="nameModal" data-bs-backdrop="static" data-bs-keyboard="true" tabindex="-1"
         aria-labelledby="nameModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content modal-crm">
@@ -3897,9 +3898,38 @@
         }
 
         document.addEventListener("click", () => closeAllDropdowns());
-        document.querySelectorAll(".modal-backdrop").forEach(m => m.addEventListener("click", e => {
-            if (e.target === m) m.classList.remove("open");
-        }));
+        // ===================== MODAL XULQI =====================
+        // Modal faqat "Bekor/Yopish" tugmalari yoki Escape bilan yopiladi.
+        // Tashqariga (backdrop) bosish modalni YOPMAYDI.
+        // Modal ichidagi bosishlar document darajasidagi "tashqarida bosildi"
+        // handlerlariga (masalan dropdownlarni yopish) o'tmaydi.
+        (function initModalBehavior() {
+            document.querySelectorAll(".modal-backdrop .modal-box").forEach(box => {
+                box.addEventListener("click", e => {
+                    closeAllDropdowns();   // modal ichidagi ochiq dropdownlar baribir yopilsin
+                    e.stopPropagation();
+                });
+            });
+
+            // Escape: eng yuqoridagi ochiq modalni uning o'z "bekor" yo'li orqali yopadi
+            // (confirm/alert Promise'lari ham to'g'ri hal bo'ladi).
+            document.addEventListener("keydown", e => {
+                if (e.key !== "Escape" || e.defaultPrevented) return;
+                const cmdk = document.getElementById("cmdk");
+                if (cmdk && cmdk.classList.contains("open")) { e.preventDefault(); closeCmdk(); return; }
+                const pwa = document.querySelector(".pwa-modal");
+                if (pwa) { e.preventDefault(); pwa.remove(); return; }
+                if (document.querySelector(".modal.show")) return;   // Bootstrap modali o'zi boshqaradi
+                const open = Array.from(document.querySelectorAll(".modal-backdrop.open"));
+                if (!open.length) return;
+                const top = open[open.length - 1];
+                e.preventDefault();
+                if (top.id === "confirm-modal") document.getElementById("confirm-modal-cancel").click();
+                else if (top.id === "alert-modal") document.getElementById("alert-modal-ok").click();
+                else if (top.id === "ts-pay-modal") tsCancelPay();
+                else closeModal(top.id);
+            });
+        })();
 
         // ===================== API FUNKSIYALARI =====================
         async function loadData() {
@@ -4651,7 +4681,7 @@
             const inp = document.getElementById("cmdkInput");
             const list = document.getElementById("cmdkList");
             if (!el || !inp || !list) return;
-            el.addEventListener("mousedown", e => { if (e.target === el) closeCmdk(); });
+            // Tashqariga (backdrop) bosish oynani YOPMAYDI: faqat Esc yoki Esc tugmasi.
             inp.addEventListener("input", () => cmdkBuild(inp.value));
             inp.addEventListener("keydown", e => {
                 if (e.key === "ArrowDown") { e.preventDefault(); if (cmdkItems.length) { cmdkSel = (cmdkSel + 1) % cmdkItems.length; cmdkRender(); } }
@@ -6751,7 +6781,7 @@
             }
 
             const modalElement = document.getElementById('nameModal');
-            nameModalInstance = new bootstrap.Modal(modalElement, { backdrop: 'static', keyboard: false });
+            nameModalInstance = new bootstrap.Modal(modalElement, { backdrop: 'static', keyboard: true });
             document.getElementById("userNameInput").value = tsSelectedStudent()?.name || "";
             nameModalInstance.show();
         }
@@ -8155,7 +8185,8 @@
     w.className = 'pwa-modal';
     w.innerHTML = '<div class="pwa-card">' + html + '<button type="button" class="pwa-ok">Tushunarli</button></div>';
     w.addEventListener('click', function (e) {
-      if (e.target === w || (e.target.classList && e.target.classList.contains('pwa-ok'))) w.remove();
+      // Faqat "Tushunarli" tugmasi yopadi (tashqariga bosish yopmaydi); Escape global handlerda.
+      if (e.target.classList && e.target.classList.contains('pwa-ok')) w.remove();
     });
     document.body.appendChild(w);
   }

@@ -214,7 +214,8 @@ function ensureAlertModal() {
         </div>
     `;
     document.body.appendChild(modal);
-    modal.addEventListener('click', (e) => { if (e.target === modal) closeAlertModal(); });
+    // Tashqariga bosish modalni yopmaydi; faqat OK tugmasi yoki Escape.
+    modal.firstElementChild.addEventListener('click', (e) => e.stopPropagation());
 }
 
 function closeAlertModal() {
@@ -272,6 +273,7 @@ function ensureConfirmModal() {
             </div>
         </div>
     `;
+    modal.firstElementChild.addEventListener('click', (e) => e.stopPropagation());
     document.body.appendChild(modal);
 }
 
@@ -300,10 +302,18 @@ function showConfirm(message, title = 'Tasdiqlash') {
         const finish = (result) => { closeConfirmModal(); resolve(result); };
         newOk.onclick = () => finish(true);
         newCancel.onclick = () => finish(false);
-        modal.addEventListener('click', (e) => { if (e.target === modal) finish(false); }, { once: true });
         modal.style.display = 'flex';
     });
 }
+
+// Escape: ag-confirm -> bekor qilish, ag-alert -> OK
+document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    const c = document.getElementById('ag-confirm-modal');
+    const al = document.getElementById('ag-alert-modal');
+    if (c && c.style.display === 'flex') { e.preventDefault(); document.getElementById('ag-confirm-cancel').click(); }
+    else if (al && al.style.display === 'flex') { e.preventDefault(); document.getElementById('ag-alert-ok').click(); }
+});
 
 // ===================== API CALL =====================
 async function apiCall(endpoint, method = 'GET', body = null) {
