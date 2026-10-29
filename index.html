@@ -2953,6 +2953,10 @@
         }
 
         .cmdk-input input:focus { border: none; box-shadow: none }
+        /* Yopish (X) tugmasi — faqat mobilda ko'rinadi, u yerda "Esc" belgisi yashiriladi */
+        .cmdk-close { display: none; flex-shrink: 0; width: 36px; height: 36px; margin: -6px -8px -6px 0; padding: 0; align-items: center; justify-content: center; border: 0; border-radius: 10px; background: rgba(255, 255, 255, .07); color: var(--text2); font-size: 15px; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background .2s, color .2s, transform .15s }
+        .cmdk-close:hover { background: rgba(255, 255, 255, .12); color: var(--text1) }
+        .cmdk-close:active { transform: scale(.92) }
 
         .cmdk-list { max-height: min(50vh, 360px); overflow-y: auto; padding: 8px }
 
@@ -3152,6 +3156,8 @@
 
             .cmdk { padding-top: calc(70px + env(safe-area-inset-top, 0px)) }
             .cmdk-foot { display: none }
+            .cmdk-input kbd { display: none }
+            .cmdk-close { display: inline-flex }
 
             /* dashboard */
             .dx-head { margin-bottom: 20px; align-items: flex-start }
@@ -3336,6 +3342,8 @@
                 <input id="cmdkInput" placeholder="Qayerga o'tamiz?" autocomplete="off" spellcheck="false">
                 <kbd role="button" tabindex="0" aria-label="Yopish" title="Yopish" style="cursor:pointer"
                     onclick="closeCmdk()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();closeCmdk()}">Esc</kbd>
+                <button type="button" class="cmdk-close" onclick="closeCmdk()" aria-label="Yopish" title="Yopish"><i
+                        class="fas fa-xmark"></i></button>
             </div>
             <div class="cmdk-list" id="cmdkList"></div>
             <div class="cmdk-foot"><span><kbd>↑</kbd><kbd>↓</kbd> tanlash</span><span><kbd>↵</kbd> ochish</span></div>
